@@ -19,6 +19,7 @@
     * Creación de un theme básico a partir de Underscores
     * Edición de HTML y estilos del theme
     * Inspector de código en Chrome y Firefox
+  * Trabajo Práctico :white_check_mark:
  
 ## PHP y Themes
 
@@ -35,6 +36,7 @@
     * Jerarquía de templates
     * Child themes
     * Carga de estilos y scripts
+  * Trabajo Práctico :white_check_mark:
   
 ## Paradigma funcinal, Plugins y Programación orientada a eventos
 
@@ -51,6 +53,7 @@
     * Plugin API
     * Acciones
     * Filtros
+  * Trabajo Práctico :white_check_mark:
 
 ## Manejo de datos en PHP y MySQL
 
@@ -70,6 +73,7 @@
     * Eliminación
     * Manejo de bases de datos en PHP: conexión y manipulación
     * Manejo de bases de datos en WordPress
+  * Trabajo Práctico :white_check_mark:
  
 ## Continuando con Paradigma funcional y más
 
@@ -83,6 +87,7 @@
     * Menús de administración
     * Options API
     * Settings API
+  * Trabajo Práctico :white_check_mark:
     
 ## Programación orientada a objetos y más
 
@@ -100,8 +105,12 @@
   * Widgets
     * Clase WP_Widget
     * Construcción de widgets propios
+  * Trabajo Práctico :white_check_mark:
  
-## Workshop, JavaScript y más
+--------------
+
+## Workshop, JavaScript y más :large_blue_circle:
+
   * Workshop
     * Creación/optimización de theme o plugin propio según los temas tratados en clase 
   * Internacionalización y localización
@@ -115,8 +124,11 @@
     * Objetos (paradigma de objetos)
     * Uso de jQuery (paradigma de eventos)
     * Impacto de JavaScript en front-end
+
+--------------
  
-## Proyecto final y Asincronismo
+## Proyecto final y Asincronismo :checkered_flag:
+
   * Proyecto final
     * Finalización de theme o plugin propio según los temas tratados en clase 
   * Asincronismo
@@ -126,3 +138,5 @@
     * Procesamiento y devolución de datos
     * Uso nativo de AJAX
     * Uso de AJAX en WordPress
+
+----------------
