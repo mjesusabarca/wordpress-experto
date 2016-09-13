@@ -102,7 +102,7 @@
     * Construcción de widgets propios
  
 ## Workshop, JavaScript y más
-  * Workshop I
+  * Workshop
     * Creación/optimización de theme o plugin propio según los temas tratados en clase 
   * Internacionalización y localización
     * Diferencia entre i18n y l10n
@@ -116,8 +116,8 @@
     * Uso de jQuery (paradigma de eventos)
     * Impacto de JavaScript en front-end
  
-## Workshop y Asincronismo
-  * Workshop II
+## Proyecto final y Asincronismo
+  * Proyecto final
     * Finalización de theme o plugin propio según los temas tratados en clase 
   * Asincronismo
     * Presentación de AJAX
