@@ -29,6 +29,7 @@ Se pueden configurar múltiples ciclos en una misma página.
 ## Jerarquía de ejecución y lectura de archivos (Template Hierarchy)
 
 https://developer.wordpress.org/themes/basics/template-hierarchy/
+
 https://wphierarchy.com/
 
 WordPress usa la Cadena de Consulta (o query string) —información contenida dentro de cada URL del sitio— para decidir qué modelo o conjunto de las plantillas se utiliza para mostrar la página.
