@@ -1,4 +1,4 @@
 # Summary
 
-* [AcercaDelCurso.md](AcercaDelCurso.md)
+* [AcercaDelCurso.md](AcercaDelCurso)
 
