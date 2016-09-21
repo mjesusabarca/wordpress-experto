@@ -1,4 +1,3 @@
 # Summary
 
-* [hola](clase1)
 
