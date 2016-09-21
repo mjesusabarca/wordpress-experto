@@ -1,6 +1,6 @@
-# wordpress-2
+# WordPress Nivel 2
 
-## Herramientas, HTML, CSS y más
+## Clase 1: Herramientas, HTML, CSS y templates
 
   * Herramientas
     * Servidores locales: XAMPP, LAMP, MAMP, WAMP, etc.
@@ -21,7 +21,7 @@
     * Inspector de código en Chrome y Firefox
   * Trabajo Práctico :white_check_mark:
  
-## PHP y Themes
+## Clase 2: PHP y themes
 
   * Intro a PHP
     * Propósito
@@ -38,7 +38,7 @@
     * Carga de estilos y scripts
   * Trabajo Práctico :white_check_mark:
   
-## Paradigma funcinal, Plugins y Programación orientada a eventos
+## Clase 3: Paradigma funcional, plugins y programación orientada a eventos
 
   * Paradigma funcional (I)
     * Funciones
@@ -55,12 +55,11 @@
     * Filtros
   * Trabajo Práctico :white_check_mark:
 
-## Manejo de datos en PHP y MySQL
+## Clase 4: Manejo de datos en PHP y MySQL
 
   * Manejo de datos en PHP
     * Creación de formularios
-    * Envío y obtención de datos
-    * $_REQUEST, $_POST y $_GET
+    * Métodos de envío y obtención de datos: `$_REQUEST`, `$_POST` y `$_GET`
     * Sanitización de datos
     * Escape de datos
   * Intro a MySQL
@@ -75,10 +74,10 @@
     * Manejo de bases de datos en WordPress
   * Trabajo Práctico :white_check_mark:
  
-## Continuando con Paradigma funcional y más
+## Clase 5: Paradigma funcional, post types y opciones personalizadas
 
   * Paradigma funcional (II)
-    * Funicones anónimas
+    * Funciones anónimas
     * Variables estáticas
   * Personalización de Post Types
     * Campos personalizados
@@ -89,7 +88,7 @@
     * Settings API
   * Trabajo Práctico :white_check_mark:
     
-## Programación orientada a objetos y más
+## Clase 6: Programación orientada a objetos y más
 
   * Programación orientada a objetos
     * Clases
@@ -99,17 +98,17 @@
     * Extensibilidad
     * Accesibilidad
   * Loops
-    * Clase WP_Query
+    * Clase `WP_Query`
     * Análisis del loop principal
     * Construcción de loops personalizados
   * Widgets
-    * Clase WP_Widget
+    * Clase `WP_Widget`
     * Construcción de widgets propios
   * Trabajo Práctico :white_check_mark:
  
 --------------
 
-## Workshop, JavaScript y más :large_blue_circle:
+## Clase 7: Workshop, traducción y JavaScript :large_blue_circle:
 
   * Workshop
     * Creación/optimización de theme o plugin propio según los temas tratados en clase 
@@ -127,7 +126,7 @@
 
 --------------
  
-## Proyecto final y Asincronismo :checkered_flag:
+## Clase 8: Proyecto final y asincronismo :checkered_flag:
 
   * Proyecto final
     * Finalización de theme o plugin propio según los temas tratados en clase 
