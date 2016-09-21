@@ -1,4 +1,4 @@
 # Summary
 
-* [hola](Clase01.md)
+* [hola](clase1)
 
