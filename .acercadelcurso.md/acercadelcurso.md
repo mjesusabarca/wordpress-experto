@@ -1,2 +1,0 @@
-# AcercaDelCurso.md
-
