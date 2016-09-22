@@ -1,5 +1,4 @@
 # Summary
 
-* [Introduction](Temario.md)
-* [Temario](Temario.md)
+* [Introduction](README.md)
 
