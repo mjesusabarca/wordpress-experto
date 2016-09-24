@@ -1,418 +1,490 @@
-# Links Útiles para Clase 5
-## PHP
+# Custom Fields y Meta Boxes
 
-* [Variables globales](http://php.net/manual/en/reserved.variables.globals.php)
-* [Alcance de variables](http://php.net/manual/en/language.variables.scope.php)
-* [Funciones anónimas](http://php.net/manual/en/functions.anonymous.php)
-* [Programación Orientada a Objetos](http://php.net/manual/en/language.oop5.php)
+La manera más rápida de agregar valores extra a los contenidos de un sitio es por medio del uso de campos personalizados, o *Custom Fields*. Estos campos personalizados se hacen visibles en la pantalla de creación o edición de un contenido cuando se chequea el campo correspondiente en *Opciones de Pantalla*. Esto va a hacer que WordPress muestre un menú en el que se puede agregar un nuevo campo con un nombre a elección y su correspondiente valor.
 
-## WordPress
+Puede obtenerse e imprimirse en pantalla ese valor desde un plugin de esta manera:
 
-* Tiempos de ejecución: [*WordPress for the adventurous: Loading*](https://carlalexander.ca/wordpress-adventurous-loading/).
-* Base de datos: [$wpdb](https://codex.wordpress.org/Class_Reference/wpdb)
-* [Shortcodes](https://codex.wordpress.org/Shortcode_API)
-* Creación de loops: [WP_Query](https://codex.wordpress.org/Class_Reference/WP_Query) y [get_posts()](https://codex.wordpress.org/Template_Tags/get_posts)
-* Manejo de posts: [WP_Post](https://codex.wordpress.org/Class_Reference/WP_Post)
-* Personalización de themes:
-  * [Theme Features](https://codex.wordpress.org/Theme_Features)
-  * [Theme Modification API](https://codex.wordpress.org/Theme_Modification_API)
-  * [Theme Customizer API](https://developer.wordpress.org/themes/advanced-topics/customizer-api/)
-  
-  #  Manipulación de Base de Datos
-
-WordPress define una clase llamada `wpdb`, la cual contiene un conjunto de métodos que se utilizan para interactuar con una base de datos. Su objetivo principal es facilitar la interacción con la base de datos de WordPress, pero se puede utilizar para comunicarse con cualquier otra base de datos.
-
-La conexión con la base de datos de una instalación de WordPress se establece a partir de la información ingresada en el archivo `wp-config.php`. Al establecer esta conexión, WordPress crea, a partir de la clase `wpdb` una variable global llamada `$wpdb`. Esta variable permite interactuar de manera directa con la base de datos a través de los métodos definidos en la clase `wpdb`.
-
-### Selección de una variable
-
-El método `wpdb::get_var()` devuelve un valor único por medio de una consulta a la base de datos. Se usa en casos en los que se consulta por un único valor.
-
-**Ejemplo:**
-
-```
+```php
 <?php
-$user_count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->users" );
-echo '<p>User count is ' . $user_count . '</p>';
-```
+add_filter( 'the_title', 'apply_title_color' );
 
-### Selección de una fila
+function apply_title_color( $title ) {
+	$color = get_post_meta( get_the_ID(), 'title_color', true );
 
-Para recuperar una fila completa de una consulta se utiliza `wpdb::get_row()`. El método puede devolver la fila como un objeto, un array asociativo, o un array de índice numérico.
-
-**Ejemplo:**
-
-```
-$row = $wpdb->get_row( "SELECT * FROM $wpdb->links WHERE link_id = 10", OBJECT ); // Devuelve un objeto.
-$row = $wpdb->get_row( "SELECT * FROM $wpdb->links WHERE link_id = 10", ARRAY_A ); // Devuelve un array asociativo.
-$row = $wpdb->get_row( "SELECT * FROM $wpdb->links WHERE link_id = 10", ARRAY_N ); // Devuelve un array de índice numérico.
-```
-
-Los valores de la variable `$row` son los nombres de las columnas del resultado de la consulta SQL (en este ejemplo, todas las columnas de la tabla `wp_links`, pero también se podría consultar por columnas específicas).
-
-De esta manera, si variable es un objeto, podríamos obtener el valor de la columna `link_id` de esta manera:
-
-```
-echo $row->link_id; // Imprime "10"
-```
-
-En caso de que la variable sea un array asociativo `link_id` se obtendría así:
-
-```
-echo $row['link_id']; // Imprime "10"
-```
-
-Y para un array de índice numérico:
-
-```
-echo $row[1]; // Imprime "10"
-```
-
-### Selección de una columna
-
-Para seleccionar una columna, contamos con el método `wpdb::get_col()`. Este método devuelve un array de índice numérico con la cantidad de resultados especificados en la consulta (o todos, si no se especifica un límite). En el siguiente ejemplo se seleccionan 10 IDs de la tabla `wp_posts`:
-
-```
-<?php
-$col = $wpdb->get_col( "SELECT ID FROM $wpdb->posts LIMIT 0, 10" );
-```
-
-### Inserción de una fila
-
-Para insertar una nueva fila en una tabla se usa el método `wpdb::insert()`.
-
-Suponiendo una tabla con el nombre `table` y con dos columnas llamadas `column1` y `column2`, podemos asignar nuevos datos para esas columnas de la siguiente manera:
-
-```
-$wpdb->insert( 
-	'table', 
-	array( 
-		'column1' => 'value1', 
-		'column2' => 123 
-	), 
-	array( 
-		'%s', 
-		'%d' 
-	) 
-);
-```
-
-### Eliminación de una fila
-
-El método `wpdb::delete()` se puede utilizar para borrar registros de una tabla. Su uso es muy similar a `wpdb::insert()`. Devuelve el número de filas actualizadas o `false` en caso de error.
-
-**Ejemplo:**
-
-```
-$wpdb->delete ( 'table', array ( 'ID' => 1 ), array ( '%d') );
-```
-
-# Shortcodes
-
-
-Los shortcodes de WordPress son pequeños códigos que puedes añadir en el editor de WordPress. Se usan para añadir funciones al contenido de tus entradas y páginas sin tener que escribir un script cada vez que necesites hacer esa tarea.
-
-Son como tags HTML que usan corchetes ([ ]) en vez de los símbolos de “mayor y menor qué” (< >). Vamos, algo así:
-
-```
-[shortcode]
-```
-
-Lo primero es elegir el archivo PHP que “acogerá” las funciones de los shortcodes. La elección más habitual es el fichero functions.php del tema activo, que casi todos incluyen, y sino lo creas manualmente. También puedes crear tu propio plugin de funciones, una opción habitualmente más limpia y controlable.
-
-Los dos pasos básicos son estos:
-
-Crea la función primaria PHP
-
-Crea el conector add_shortcode, cuya función es conectar la función primaria PHP a WordPress (creas el shortcode para la función PHP y luego lo insertas en el editor de WordPress para que active esa función)
-Como he apuntado, una vez insertes el [shortcode] en tu editor, WordPress se conectará con el archivo functions.php o plugin de funciones y reemplazará de manera automática el shortcode con la función que creaste.
-
-Una vez hayas creado las funciones, sean pocas o muchas, todo lo que tienes que hacer es insertar el shortcode único asociado a cada función cada vez que lo quieras usar en tu editor.
-
-1.  Abrir el archivo de funciones (functions.php) de tu tema, normalmente en /wp-content/themes/tutema/functions.php, o el plugin de funciones y crear la función.
-
-Un ejemplo sencillo sería algo así:
-
-```
-function shortcode_gracias() {
-	return '<p>¡Gracias por todo!</p>';
+	if ( $color ) {
+		$title = '<span style="color: ' . $color . '">' . $title . '</span>';
+	}
+	
+	return $title;
 }
-add_shortcode('gracias', 'shortcode_gracias');
 ```
 
-Guarda los cambios del archivo de funciones, ya estás listo para usar tu nuevo shortcode.
+O mostrar todos los valores de campos personalizados previamente cargados de esta forma:
 
-2. Pon el nuevo shortcode [gracias] en el lugar que desees de tu editor de WordPress.
-
-Una vez guardes los cambios en tu página se vería el resultado de la función “llamada” por el shortcode, viéndose algo así:
-
-```
-¡Gracias por todo!
-```
-
-Ahora veremos unos ejemplos de uso de Shorcodes:
-
-**Shorcodes en widgets de texto**
-
-Lo primero es añadir este código al fichero functions.php de tu tema activo:
-
-```
-add_filter( 'widget_text', 'shortcode_unautop');
-add_filter( 'widget_text', 'do_shortcode');
-```
-
-La segunda línea es la que hace que funcionen los shortcodes en el widget de texto. Además, hay que tener en cuenta que los widgets de texto tienen una casilla para “añadir saltos de párrafo automáticamente”, pues bien, la segunda linea inhabilita el código autop que podría, en caso de estar marcada la casilla, meter el shortcode introducido en un párrafo o incluso romper las tags.
-
-**Shortcodes en el tema**
-
-También se pueden usar shortcodes en el tema que uses. Para ello utilizamos la función do_shortcode() en la que el argumento será una cadena que contendrá el shortcode.
-
-Por ejemplo, para mostrar el shortcode [publicidad] en tu tema pondrías algo así donde quieras que aparezca el resultado esperado:
-
-```
-<?php do_shortcode('[publicidad]'); ?>
-```
-
-La función do_shortcode() acepta cualquier tipo de texto. Si la cadena contiene un shortcode procesará ese código. De este modo, por ejemplo, podrías mostrar manualmente contenido de tus entradas de este modo:
-
-```
+```php
 <?php
-$content = get_the_content();
-echo do_shortcode($content);
+add_filter( 'the_content', 'show_post_meta' );
+function show_post_meta( $content ) {
+	ob_start();
+
+	the_meta();
+	$content .= ob_get_contents();
+
+	ob_end_clean();
+
+	return $content;
+}
+```
+
+La ventaja de esta forma de gestionar campos personalizados es que es rápida. Hace falta muy poco código para mostrar nuevos datos. Es muy útil para salir de un apuro o con fines de testing, pero para desarrollo de plugins dista bastante de ser óptima. En primer lugar, porque los campos tienen que ser creados manualmente, y se requiere que el usuario conozca el nombre de estos campos para poder ingresar información. Esto no es una muy buena práctica, porque parte de la lógica de la aplicación se manejaría como contenido, y no como código.
+
+Por otra parte, este método también es limitante en cuanto a cómo se carga la información: no se puede modificar el formato de los campos personalizados. Su formato por defecto puede ser muy útil para ingresar texto, pero si se necesita manejar otro tipo de información, como un array, o elegir entre una cantidad limitada de opciones, los campos personalizados no alcanzan.
+
+La solución es crear *meta boxes*. Las meta boxes son, básicamente, campos personalizados con esteroides. A la hora de guardar y obtener información funcionan casi de la misma manera que los campos personalizados, pero brindan control completo sobre el HTML que generan, por lo cual se puede crear cualquier tipo de campo para que los usuarios ingresen datos, en lugar de limitarnos a un input de texto. Además, manejan el nombre del campo internamente, por lo cual no es necesario que el usuario lo conozca a la hora de ingresar datos. También ofrecen control absoluto acerca de cómo se guarda esa información, por lo cual, si se necesita hacer algún tipo de validación de datos o correr algún tipo de proceso sobre la información ingresada antes de guardarla, puede hacerse sin problema.
+
+Agregar meta boxes es muy sencillo, y para hacerlo es necesario asignar una función al evento `add_meta_boxes`, el cual corresponde al momento en el que WordPress registra este tipo de información.
+
+```php
+<?php
+add_action( 'add_meta_boxes', 'register_meta_box' );
+
+function register_meta_box() {
+	add_meta_box(
+		$id,       // Atributo "id" impreso en el contenedor HTML. String.
+		$title,    // Título de meta box. String.
+		$callback, // Función que imprime nuestro HTML. String o función anónima.
+		$screen,   // Opcional. Vista o vistas donde va a aparecer la meta box. Nombres de post types u objeto WP_Screen.
+	);
+}
+```
+
+Teniendo en cuenta estos parámetros, la función se vería similar a esta:
+
+```php
+<?php
+add_action( 'add_meta_boxes', 'register_meta_box' );
+
+function register_meta_box() {
+	add_meta_box(
+		'my-meta-box'
+		__( 'My meta box', 'my-plugin' ),
+		'my_metabox_callback',
+		'post', // También son válidos 'page', array( 'post', 'page' ) y current_screen().
+	);
+}
+
+function my_metabox_callback() {
+	echo 'Hello world!'
+}
+```
+
+Aunque con este código todavía no es posible cargar nueva información, ya puede verse una nueva meta box en las pantallas de edición y creación de posts. La función `add_meta_box()` también acepta otros tres parámetros opcionales más: `$context`, para definir en qué sección de la pantalla va a aparecer la meta box; `$priority`, para indicar qué prioridad tiene dentro del contexto en el que se la registra; y `$callback_args`, para enviarle información adicional a nuestro callback dentro de un array. 
+
+El siguiente paso es imprimir, a través del callback, algún tipo de información que un usuario pueda cargar. Para eso simplemente puede crearse un campo de formulario dentro de la función e imprimirlo.
+
+Con este código puede verse un campo de tipo select dentro de la meta box:
+
+```php
+<?php
+add_action( 'add_meta_boxes', 'register_meta_box' );
+
+function register_meta_box() {
+	add_meta_box(
+		'my-meta-box'
+		__( 'My meta box', 'my-plugin' ),
+		'my_metabox_callback',
+		'post', // También son válidos 'page', array( 'post', 'page' ) y current_screen().
+	);
+}
+
+function my_metabox_callback() { ?>
+	<select name="_my_selectable_option">
+		<option value="value-1"><?php _e( 'Value 1', 'my-plugin' ); ?></option>
+		<option value="value-2"><?php _e( 'Value 2', 'my-plugin' ); ?></option>
+	</select>
+<?php
+}
+```
+
+Con lo que logrado hasta ahora, un usuario puede seleccionar información, pero aún no puede guardarla. Para eso vamos a necesitar una nueva acción en el evento `save_post`, donde se chequee y se guarde la información que estamos enviando.
+
+```php
+<?php
+add_action( 'add_meta_boxes', 'register_meta_box' );
+function register_meta_box() {
+	add_meta_box(
+		'my-meta-box'
+		__( 'My meta box', 'my-plugin' ),
+		'my_metabox_callback',
+		'post', // También son válidos 'page', array( 'post', 'page' ) y current_screen().
+	);
+}
+
+function my_metabox_callback() { ?>
+	<select name="_my_selectable_option">
+		<option value="value-1"><?php _e( 'Value 1', 'my-plugin' ); ?></option>
+		<option value="value-2"><?php _e( 'Value 2', 'my-plugin' ); ?></option>
+	</select>
+<?php
+}
+
+add_action( 'save_post', 'save_my_meta_box_data' );
+function save_my_meta_box_data( $post_id ) {
+	$data = get_post_meta( $post_id, '_my_selectable_option', true );
+
+	if ( empty( $data ) ) {
+		add_post_meta( $post_id, '_my_selectable_option', $_POST['_my_selectable_option'], true );
+	} elseif ( $data != $_POST['_my_selectable_option'] ) {
+		update_post_meta( $post_id, '_my_selectable_option', $_POST['_my_selectable_option'] );
+	}
+}
+```
+
+Este código sirve para guardar la información ingresada en la meta box al guardar un post. Lo que hace es chequear si ya existen datos para el post actual con el nombre del campo creado. Si no existen, los ingresa en la base de datos; si existen, y además son distintos de los que estamos enviando al guardar, los actualiza. Sin embargo, no se está haciendo ningún chequeo de seguridad, por lo cual un usuario malicioso podría ingresar cualquier tipo de información en ese campo, provocando problemas bastante graves. Es por eso que necesitamos ser más específicos en nuestros chequeos.
+
+```php
+<?php
+/**
+ * Necesitamos chequear:
+ *
+ * - Que la información que hace falta actualizar se esté enviando.
+ * - Que la actualización se esté haciendo en el momento y lugar correctos.
+ * - Que el usuario tenga permisos para modificar la información.
+ * - Que la información a actualizar sea válida.
+ */
+
+add_action( 'add_meta_boxes', 'register_meta_box' );
+function register_meta_box() {
+	add_meta_box(
+		'my-meta-box'
+		__( 'My meta box', 'my-plugin' ),
+		'my_metabox_callback',
+		'post', // También son válidos 'page', array( 'post', 'page' ) y current_screen().
+	);
+}
+
+function my_metabox_callback() {
+	wp_nonce_field( '_my_selectable_option', '_my_selectable_option_nonce' );
 ?>
-```
-
-**Shortcodes en comentarios**
-
-De nuevo recurrimos al fichero functions.php para añadirle este código que permite shortcodes en los campos de comentarios:
-
-```
-add_filter( 'comment_text', 'shortcode_unautop');
-add_filter( 'comment_text', 'do_shortcode' );
-```
-
-**Shortcodes en extractos**
-
-Ahora, en functions.php añadiremos esto para poder insertar shortcodes en los extractos de entrada:
-
-```
-add_filter( 'the_excerpt', 'shortcode_unautop');
-add_filter( 'the_excerpt', 'do_shortcode');
-```
-
-**Shortcodes en la descripción de usuario**
-
-Para poder meter shortcodes en la descripción del usuario hay que pasar la cadena de descripción por la función do_shortcode(). Para ello tendrás que añadir esto a tu tema activo:
-
-```
+	<select name="_my_selectable_option">
+		<option value="value-1"><?php _e( 'Value 1', 'my-plugin' ); ?></option>
+		<option value="value-2"><?php _e( 'Value 2', 'my-plugin' ); ?></option>
+	</select>
 <?php
-// $user_id = 3;
-$userdata = get_userdata($user_id);
-echo do_shortcode($userdata->description);
-?>
-```
-Solo tendrás que cambiar el ID de usuario, en este caso el 3.
-
-**Shortcodes en descripciones de etiquetas, categorías y taxonomías**
-
-También puedes filtrar estas descripciones. Para ello recurrimos de nuevo al fichero functions.php:
-
-```
-add_filter( 'term_description', 'shortcode_unautop');
-add_filter( 'term_description', 'do_shortcode' );
-```
-
-# Personalización de Theme
-
-## Theme mods (Get-Remove-Set)
-
-### `get_theme_mod()`
-
-Es posible  recuperar un ajuste de modificacion para el theme actual. Junto con `set_theme_mod()` esta función a veces ofrece a los desarrolladores una alternativa más simple a la Options API cuando existe la necesidad de manejar ajustes básicos sobre themes concretos.
-
-#### Uso
-
-```
-<?php get_theme_mod( $name, $default ); ?>
-```
-
-#### Ejemplo
-
-```
-.footer {
-     border-top: solid 1px #<?php echo get_theme_mod( 'background_color', 'red' ); ?>;
 }
 
-```
+add_action( 'save_post', 'save_my_meta_box_data', 10, 2 );
+function save_my_meta_box_data( $post_id, $post ) {
+	// Si no se reciben datos, salir de la función.
+	if ( ! isset( $_POST['_my_selectable_option'] ) ) {
+		return;
+	}
 
-##  `get_theme_mods()`
+	// Si no se aprueba el chequeo de seguridad, salir de la función.
+	if ( ! isset( $_POST['_my_selectable_option_nonce'] ) || ! wp_verify_nonce( $_POST['_my_selectable_option_nonce'], '_my_selectable_option' ) ) {
+		return;
+	}
 
+	$post_type = get_post_type_object( $post->post_type );
 
-Esta función permite recuperar todos los valores de modificaciones para el theme actual.
+	// Si el usuario actual no tiene permisos para modificar el post, salir de la función.
+	if ( ! current_user_can( $post_type->cap->edit_post, $post_id ) ) {
+		return;
+	}
 
-#### Uso
+	// Convertimos los datos ingresados a un formato válido para nuestro campo.
+	$valid_data = esc_html( $_POST['_my_selectable_option'] );
 
-```
-<? php get_theme_mods();  ?>
+	$data = get_post_meta( $post_id, '_my_selectable_option', true );
 
-```
-
-#### Ejemplo
-
-```
-$mods = get_theme_mods();
-var_dump($mods);
-// output example:
-//    array(2) { ["header_textcolor"]=> string(3) "333" ["header_image"]=> string(20) "random-default-image" }
-var_dump($mods['header_textcolor']);
-// output example:
-//    string(3) "333"
-```
-
-##  `remove_theme_mod()`
-
-Remueve el nombre de la modificación del tema desde la lista del tema actual.
-
-Si la remoción del nombre remueve todos los elementos, toda la opción por defecto será eliminada
-
-#### Uso
-
-```
-<?php remove_theme_mod( $name ) ?>
-```
-
-##  `remove_theme_mods()`
-
-Elimina todas las opciones de modificación para el theme actual.
-
-#### Uso
-
-```
-<?php remove_theme_mods() ?>
-```
-
-##  `set_theme_mod()`
-
-Crea o actualiza una opción de modificación para el theme actual.
-
-#### Uso
-
-```
-<? php set_theme_mod (  $nombre,  $valor  );  ?>
-```
-
----
-
-## Theme Customizer
-
-El Personalizador de temas es un marco para la vista previa y en vivo de cualquier cambio realizado a WordPress. Este proporciona una interfaz simple y consistente para que los usuarios puedan personalizar diversos aspectos de su tema y su sitio, tales como los colores y diseños para los widgets, menús y mucho más. También es posible agregar opciones personalizadas de themes y plugins al personalizador. En resumen, el personalizador es una herramienta sencilla que nos permite añadir opciones a nuestro tema.  
-
-Una de las opciones del personalizador es conceder a los usuarios diferentes capacidades de manejo del mismo, en donde la mayoría de las opciones sólo son visibles para los administradores en forma predeterminada, mientras que otros usuarios pueden acceder a ciertas opciones si el administrador considera y cree que son capaces de hacerlo.
-
-Para añadir sus propias opciones para el personalizador, es necesario utilizar un mínimo de 2 ganchos (hooks):
-
-**customize_register**
-Este gancho permite definir nuevos paneles para el personalizador: secciones, los ajustes y controles.
-
-**wp_head** 
-Este gancho  permite que la salida de CSS generada  se muestre correctamente en el sitio en línea.
-
-
-### Añadir el Personalizador de temas al menú de administración
-
-**Nota :** El primer paso ya no es necesario con las nuevas versiones de WordPress . El personalizador se añade automáticamente al menú incluso si el tema no lo usa . Por lo tanto saltamos al siguiente paso.
-
-Primero abriremos el archivo **functions.php** del tema y agregamos el código siguiente . Realmente no importa en qué parte del archivo **functions.php** colocamos el código con tal de que no está dentro de otra función .
-
-```
-function example_customizer_menu() {
-    add_theme_page( 'Customize', 'Customize', 'edit_theme_options', 'customize.php' );
+	if ( empty( $data ) ) {
+		add_post_meta( $post_id, '_my_selectable_option', $valid_data, true );
+	} elseif ( $data != $_POST['_my_selectable_option'] ) {
+		update_post_meta( $post_id, '_my_selectable_option', $valid_data );
+	}
 }
-add_action( 'admin_menu', 'example_customizer_menu' );
 ```
 
-Aquí creamos un nuevo título  de función, " **example_customizer_menu** " y lo adjuntamos a  " **admin_menu** " de acción 
+En el primer chequeo, en caso de que no se reciba la información esperada, simplemente se sale de la función sin guardar. El segundo chequeo es algo más complejo, pero sirve para introducir un concepto muy importante en cuestión de seguridad: los *nonces*.
 
+Un *nonce* es, básicamente, un tipo de dato generado por WordPress que consiste en un valor numérico variable, y que permite chequear que un proceso dado se esté ejecutando en el momento y desde el lugar adecuados. Está pensado para cuando se necesita ejecutar operaciones delicadas, que requieren un cierto nivel de seguridad, como el almacenamiento de información en la base de datos.
 
-Esta función tiene sólo una línea , y se llama a la función **add_theme_page ( )** para añadir páginas a la zona de administración de WordPress . Esta función tiene cuatro parámetros requeridos .
+Para poder chequear que un nonce sea válido antes de guardar datos, primero se lo debe crear.  Es por eso que dentro del callback que genera el HTML de nuestra meta box va a usarse la función `wp_nonce_field()` con dos parámetros: el primero es una palabra clave que permite identificar el contexto en el que se genera el nonce, y el segundo es el nombre del dato que va a contener el valor numérico del nonce y va a llegar por medio de la variable global `$_POST` cuando se guarde la entrada.
 
+Al chequear un nonce debe confirmarse que el dato que lo contiene está creado, lo cual hacemos con `isset()`. También se necesita chequear con `wp_verify_nonce()` que el dato numérico corresponda al contexto definido. Si alguna de estas dos cosas no pasa, se sale de la función sin guardar información. Si se pasan ambos chequeos, se continúa.
 
-**Function**: add_theme_page( $page_title, $menu_title, $capability, $menu_slug, $function );
+Por último, debe confirmarse que los datos que se van a ingresar tengan el formato correcto. Por ejemplo, si lo que se desea guardar en la base de datos es un array, pero recibimos un string, se debe lo debe convertir en un array; si se espera texto plano pero se recibe HTML, se debe convertir a texto plano. Este proceso se llama *sanitización*, y permite asegurarse de que un usuario malicioso no va a poder ingresar algún tipo de información que dañe la base de datos. Además, garantiza que los datos introducidos en el sistema siempre van a ser los esperables.
 
-**$page_title	- string	**
+En el ejemplo se usa la función `esc_html()` para asegurarse de que cualquier texto que pueda ser ingresado como HTML se convierta en texto plano. Hay una cantidad bastante grande de [funciones de sanitización](https://codex.wordpress.org/Validating_Sanitizing_and_Escaping_User_Data) provistas por WordPress, las cuales se pueden chequear en la documentación oficial. Algunas de esas funciones son más recomendables para mostrar datos (lo cual se llama *escape*), y otras son preferibles a la hora de guardarlos (lo cual se llama *validación*).
 
-Este será el texto del título de la nueva página . Sin embargo , la página del personalizador no tiene un título, así que supongo que esto no importa demasiado.
+# Menús de administración
 
-**$menu_title	- string	**
+Es bastante corriente que nuestros plugins necesiten algún tipo de configuración global, más allá de la información de podemos manipular por medio de post types y meta boxes. Para estos casos, generalmente necesitamos crear alguna pantalla de administración propia de nuestro plugin, donde el usuario pueda configurar las opciones que definan su funcionamiento.
 
-Este será el texto del nuevo elemento de menú en el menú " Apariencia " .
+Con este fin es que WordPress nos ofrece tres tipos de herramientas: **menús de administración**, ***Options API*** y ***Settings API***. Cada una consiste en un conjunto de funciones que nos permiten definir cómo se van a manejar las configuraciones internas de nuestro plugin. En esta clase vamos a ver la primera, los menús de administración.
 
-**$capability	- string	**
+Los menús de administración son esas secciones que vemos en la barra lateral de navegación en nuestro panel de administración. Cada uno de ellos tiene un link principal, y además pueden tener un segundo nivel de links, que vemos cuando estamos navegando un menú o cuando pasamos el mouse por encima del link principal. Estos links secundarios son lo que llamamos sub-menús.
 
-Esto hace que el usuario tenga los permisos adecuados para acceder al personalizador
+Por último tenemos las páginas de opciones, que son aquellos links que vemos ubicados debajo del menú *Settings* (o *Configuración*). 
 
-**$menu_slug -	string	**
+Para agregar un menú usamos la función `add_menu_page()`, y la asignamos como acción al evento `admin_menu`. Con este ejemplo de código podemos crear un menú y asociarle una interfaz muy básica.
 
-El único slug del menú único para esta página.
+```php
+<?php
+add_action( 'admin_menu', 'portfolio_menu_page' );
 
-### Añadir una nueva sección al personalizador
-
-Para crear nuestra propia configuración de la sección , vamos a colocar el siguiente fragmento de código en el archivo **functions.php** justo debajo del código que agregó anteriormente ( una vez más , la colocación no importa mucho , es simplemente más fácil añadir el código en orden).
-
-```
-function example_customizer( $wp_customize ) {
-    $wp_customize->add_section(
-        'example_section_one',
-        array(
-            'title' => 'Example Settings',
-            'description' => 'This is a settings section.',
-            'priority' => 35,
-        )
-    );
+function portfolio_add_menu_page() {
+    add_menu_page( 
+        __( 'Portfolio Settings', 'portfolio' ), // Texto del título que aparece en la página de opciones.
+        __( 'Portfolio', 'portfolio' ),          // Texto que aparece en el link principal del menú.
+        'manage_options',                        // Permiso que debe tener el usuario para ver el menú.
+        'portfolio-settings',                    // Slug, string que permite identificar internamente el menú.
+        'portfolio_menu_page',                   // Nombre de la función que imprime el HTML de la página de opciones.
+        'dashicons-art',                         // Icono del menú. Podemos usar Dashicons o una URL.
+        10,                                      // Posición en la que aparece el menú en la barra de navegación.
+    ); 
 }
-add_action( 'customize_register', 'example_customizer' );
+ 
+function portfolio_menu_page(){
+    _e( 'Set Portfolio options here.', 'portfolio' );  
+}
 ```
 
-**Tenga en cuenta :** Usted no será capaz de ver la configuración de la sección hasta que contenga al menos un ajuste .
+Cuando guardemos nuestro código y refresquemos el browser, vamos a ver que contamos con un nuevo menú de administración. Haciendo click en el link del menú, vamos a ver el texto que imprimimos dentro de nuestra función callback.
 
+También podemos, en lugar de crear un nuevo menú para nuestra página de opciones, ubicar un link debajo de Settings. Esto es lo que hacen muchos desarrolladores de plugins para que la barra de navegación no se vea tan larga.
 
-Ahora bien, hemos unido nuestra función a la acción " **customize_register** " para garantizar que se ejecute en el momento adecuado.
+El procedimiento es muy similar a agregar un menú, pero usando la función `add_options_page()`. Simplemente reemplazamos el código anterior por este:
 
-El objeto **$wp_customize** se pasa a nuestra función y podemos utilizar sus métodos para agregar secciones, ajustes y controles para el personalizador de temas .
+```php
+<?php
+add_action( 'admin_menu', 'portfolio_menu_page', 999 );
 
-Vamos a empezar por la adición de una sección utilizando el método **add_section () .** Este método acepta dos parámetros.
+function portfolio_add_menu_page() {
+    add_options_page( 
+        __( 'Portfolio Settings', 'portfolio' ), // Texto del título que aparece en la página de opciones.
+        __( 'Portfolio', 'portfolio' ),          // Texto que aparece en el link principal del menú.
+        'manage_options',                        // Permiso que debe tener el usuario para ver el menú.
+        'portfolio-settings',                    // Slug, string que permite identificar internamente el menú.
+        'portfolio_menu_page',                   // Nombre de la función que imprime el HTML de la página de opciones.
+    ); 
+}
+ 
+function portfolio_menu_page(){
+    _e( 'Set Portfolio options here.', 'portfolio' );  
+}
+```
 
+Cuando refresquemos el browser después de guardar, la ubicación de nuestro link va a haber cambiado, pero vamos a seguir viendo la misma página. Lo único que no podemos desde definir desde `add_options_page()` es un ícono, ya que los sub-menús y links páginas de opciones no tienen ninguno, ni la posición en la que va a aparecer el link. Para la posición podemos jugar un poco con las prioridades de `add_action()` hasta que el link se vea donde pretendemos. En el ejemplo hay una prioridad alta (999) para que aparezca lo más cerca posible del final de la lista.
 
-Método: add_section( $id, $args );
+Una tercera alternativa, más ordenada, es ubicar el link a nuestra página de opciones dentro del menú que se creó automáticamente para nuestro post type. Como ya vimos al agregar un menú principal, todo menú cuenta con un slug o palabra clave para que pueda ser reconocido internamente, y para agregar un sub-menú necesitamos conocer el slug del menú principal.
 
-**$id -	string**
+En el caso de los post types, el nombre del slug es un poco más rebuscado que el de los que venimos definiendo, pero es fácilmente reconocible: `edit.php?post_type={nombre_del_post_type}`. En nuestro caso, como nuestro post type es `project`, el slug del menú va a ser `edit.php?post_type=project`. Teniendo esto en cuenta, la forma de registrar un sub-menú es prácticamente igual al ejemplo anterior, pero usando la función `add_submenu_page()`.
 
-El ID único de esta sección
+```php
+<?php
+add_action( 'admin_menu', 'portfolio_menu_page', 999 );
 
-**$args	- array**
+function portfolio_add_menu_page() {
+    add_submenu_page(
+        'edit.php?post_type=project',            // Slug del menú principal.
+        __( 'Portfolio Settings', 'portfolio' ), // Texto del título que aparece en la página de opciones.
+        __( 'Portfolio Settings', 'portfolio' ), // Texto que aparece en el link principal del menú.
+        'manage_options',                        // Permiso que debe tener el usuario para ver el menú.
+        'portfolio-settings',                    // Slug, string que permite identificar internamente el menú.
+        'portfolio_menu_page',                   // Nombre de la función que imprime el HTML de la página de opciones.
+    ); 
+}
+ 
+function portfolio_menu_page(){
+    _e( 'Set Portfolio options here.', 'portfolio' );  
+}
+```
 
-Conjunto de argumentos pasados a la función **add_section ( ) .**
+Al refrescar el browser van a ver que el link cambió nuevamente de ubicación, y ahora está en el último lugar del menú de *Projects*.
 
-El array **$args** nos permite especificar una serie de detalles acerca de la configuración de la sección que estamos creando .
+Algo importante a tener en cuenta es que, si estamos mirando la página de administración que acabamos de crear, al cambiar el link de lugar y refrescar la página, WordPress puede mostrar un error. Esto no es porque hayamos hecho algo mal, sino porque al cambiar la ubicación del link también puede cambiar la URL que se le asigna, pero con volver a la página principal del panel de administración vamos a poder ver el link en su nueva ubicación, y acceder a él desde su nueva URL sin problemas.
 
-Array: $args
+# Options API
 
-**title -	string**	
+Ya vimos cómo crear una página de administración para nuestro plugin, pero todavía no podemos guardar opciones a través de esa página. Para poder gestionar nuestras opciones, WordPress nos ofrece la Options API, un conjunto de funciones muy sencillas para manipular configuraciones internamente en nuestros plugins.
 
-Título de la sección de configuración .
+Para poder ingresar información desde nuestra página de opciones, primero tenemos que ofrecer algún campo con el que el usuario quiera interactuar. Por el momento vamos a agregar una única opción: la de mostrar proyectos solo a usuarios registrados. Para eso, vamos a retomar la función que usamos para mostrar la página de administración:
 
-**description	- string**	
+```php
+<?php
+function portfolio_menu_page() {
+	$settings = get_option( 'portfolio_settings' );
+	$checked  = isset( $settings['show_logged_only'] ) ? $settings['show_logged_only'] : false;
 
-Opcional. Descripción de la sección de configuración . Esto sólo se muestra como un consejo cuando se pasa el ratón sobre el título de la sección .
+	wp_nonce_field( '_portfolio_settings', '_portfolio_settings_nonce' );
 
-**priority	- integer**
+	?>
+		<form method="post">
+			<input id="portfolio-settings-show-logged-only" name="portfolio_settings[show_logged_only]" type="checkbox" value="true" <?php checked( $checked ); ?>/> 
+			<label for="portfolio-settings-show-logged-only"><?php _e( 'Only show projects to logged-in users', 'portfolio' ); ?></label>
 
-Opcional. La prioridad determina el orden en el que se mostrarán las secciones . Los números más bajos son los primeros.
+			<input type="submit" class="button button-save" value="<?php _e( 'Save options', 'portfolio' ); ?>" />
+		</form>
+	<?php
+}
+```
 
-**capability	- string**
+Al refrescar la página vamos a ver aparecer la opción. Noten como, en las dos primeras líneas de esta función, chequeamos si nuestro plugin guardó datos previamente, y a partir de eso decidimos si el checkbox tiene que mostrarse tildado o no. También creamos el nonce que nos va a permitir validar los datos cuando se envíen.
 
-Opcional. Muestra u oculta la sección sobre la base de los niveles de permisos del usuario.
+Ahora tenemos que ver cómo se guardan esos datos. El proceso es muy parecido a lo que hacíamos con las meta boxes.
 
-**theme_supports	- string**
+```php
+<?php
+add_action( 'admin_init', 'portfolio_save_settings' );
 
-Opcional. Muestra u oculta la sección en función de si el tema es compatible con una característica en particular .
+function portfolio_save_settings() {
+	// Si no se aprueba el chequeo de seguridad, salir de la función.
+	if ( ! isset( $_POST['_portfolio_settings_nonce'] ) || ! wp_verify_nonce( $_POST['_portfolio_settings_nonce'], '_portfolio_settings' ) ) {
+		return;
+	}
+
+	// Si el usuario actual no tiene permisos para actualizar la configuración, salir de la función.
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	// Chequeamos si el dato se envió para decidir si mostramos los proyectos a todos usuarios o no.
+	if ( isset( $_POST['portfolio_settings']['show_logged_only'] ) ) {
+		// Si el valor se envío, chequeamos si tiene un valor permitido. Si lo tiene, mostramos proyectos solo a usuarios registrados.
+		$accepted_values = array( true, 'true' );
+		$show_logged_only = in_array( $_POST['portfolio_settings']['show_logged_only'], $accepted_values );
+	} else {
+		// Si el valor no se envió, mostramos proyectos a todos los usuarios.
+		$show_logged_only = false;
+	}
+
+	// Creamos un flag para evaluar si ya tenemos la configuración guardada en al base de datos.
+	$settings_empty = false;
+
+	// Obtenemos la configuración del plugin, si existe.
+	$settings = get_option( 'portfolio_settings' );
+
+	// Si no hay una configuración previa guardada en la base de datos, lo indicamos, y creamos un array vacío para contenerla.
+	if ( empty( $settings ) ) {
+		$settings_empty = true;
+		$settings = array();
+	}
+
+	// Si el valor de la configuración que estamos modificando no existe o es diferente al que evaluamos, lo cambiamos por el nuevo valor.
+	if ( ! isset( $settings['show_logged_only'] ) || $settings['show_logged_only'] != $show_logged_only ) {
+		$settings['show_logged_only'] = $show_logged_only;
+	}
+
+	if ( $settings_empty ) {
+		// Si la configuración está vacía, la creamos.
+		add_option( 'portfolio_settings', $settings );
+	} else {
+		// Si la configuración no está vacía, la actualizamos.
+		update_option( 'portfolio_settings', $settings );
+	}
+}
+```
+
+Con estos chequeos y el uso de `add_option()` y `update_option()` podemos crear y modificar la configuración de nuestro plugin. Es importante tener en cuenta que cada opción manejada por estas funciones genera una nueva entrada en la base de datos, y si para cada configuración que necesitemos en nuestro plugin creamos una entrada nueva, estamos complejizando la base de datos, lo cual, a la larga, puede llevar a problemas de rendimiento para sitios web con bases de datos grandes. Por eso lo que hacemos acá, y lo que cada vez se recomienda más, es usar una sola opción para guardar nuestra configuración, e incluir todos los datos que necesitamos dentro de un array.
+
+Ahora bien, necesitamos ver cómo reflejar en el front-end estos cambios que introdujimos. Para eso vamos a volver a asignar una función a `the_content`, como en los ejemplos anteriores, pero en vez agregarle cosas al contenido, lo vamos a modificar por completo en caso de que el usuario no esté logueado, y que solo queramos mostrar proyectos a usuarios registrados. Para eso vamos a usar una prioridad con un número alto, y así asegurarnos de que la función se ejecute lo más tarde posible.
+
+```php
+<?php
+add_filter( 'the_content', 'portfolio_project_show_logged_in_only', 999 );
+
+function portfolio_project_show_logged_in_only( $content ) {
+	$settings = get_option( 'portfolio_settings' );
+
+	// Si se elige mostrar solo a usuarios registrados y el usuario actual no está logueado, reemplazamos el contenido por un mensaje.
+	if ( ! empty( $settings['show_logged_in_only'] ) && ! is_user_logged_in() ) {
+		$content = __( 'You don\'t have permissions to view this content.', 'portfolio' );
+	}
+
+	return $content;
+}
+```
+
+De todas maneras, si bien la Options API es la herramienta que WordPress usa internamente y recomienda para manejar configuraciones propias, a la hora de manejar el guardado de datos y generación de campos en menús de administración, no es la mejor solución que tenemos a nuestro alcance, ya que tiene una gran cantidad de limitaciones. Es importante entender cómo funciona y cuáles son sus funciones principales, porque en desarrollo de plugins es casi inevitable usarla, pero para lo que acabamos de hacer, la mejor solución que nos ofrece WordPress es la ***Settings API***, que es el tema del próximo capítulo.
+
+# Settings API
+
+Ya vimos cómo se maneja la *Options API* para guardar la configuración de nuestro plugin, y recomendamos usar una única opción para guardar todos nuestros datos, construyendo un array. También vimos que para guardar nuestra configuración tenemos que hacer una serie de chequeos de seguridad que pueden llegar a ser tediosos, o pueden volver nuestras funciones muy largas y complicadas de mantener.
+
+Todos estos problemas se pueden resolver usando la *Settings API*. Lo que nos permite esta API es sacarnos de encima gran parte de los procesos de seguridad y validación que necesitamos para guardar nuestros datos, y en consecuencia vuelve nuestro código más estable, más sencillo de mantener, y más extensible.
+
+Una diferencia que vamos a tener con respecto a lo visto anteriormente es que no vamos a imprimir de manera directa el HTML que genera nuestros campos. En cambio, nuestros campos tienen que ser registrados en la *Settings API*, y asignados a una sección.
+
+```php
+<?php
+add_action( 'admin_init', 'portfolio_settings_api_init' );
+
+function portfolio_settings_api_init() {
+ 	// Registramos una sección para nuestro campo.
+ 	add_settings_section(
+		'portfolio-general-settings-section',          // Texto del tag `id` de la sección.
+		__( 'General Settings', 'portfolio' ),         // Título de la sección.
+		'portfolio_general_settings_section_callback', // Nombre de la función que imprime el HTML de la sección.
+		'portfolio-settings'                           // Slug del menú donde debe aparecer la sección.
+	);
+ 	
+ 	// Registramos un campo asociado a la sección.
+ 	add_settings_field(
+		'portfolio-settings-show-logged-only-setting',              // Texto del tag `id` del campo.
+		__( 'Only show projects to logged-in users', 'portfolio' ), // Título del campo.
+		'portfolio_settings_show_logged_only_callback',             // Nombre de la función que imprime el HTML del campo.
+		'portfolio-settings',                                       // Slug del menú donde debe aparecer el campo.
+		'portfolio-general-settings-section'                        // ID de la sección a la que pertenece el campo.
+	);
+ 	
+ 	// Registramos nuestro campo como setting.
+	// El primer parámetro es el nombre de la opción que estamos usando para guardar la configuración.
+	// El segundo parámetro es el identificador de nuestra setting dentro del array de opciones.
+	// El tercer parámetro es el nombre de la función que va a sanitizar los datos de la opción.
+	// Esta función se ocupa de validar nuestros datos por medio de nonces.
+ 	register_setting( 'portfolio_settings', 'show_logged_only', 'portfolio_sanitize_show_logged_only' );
+}
+
+// Callback para la sección.
+function portfolio_general_settings_section_callback() {
+	_e( 'Configure the general plugin settings here' );
+}
+
+// Callback para el campo. Solamente imprimimos el input y su label, no el tag form ni el botón de confirmación.
+function portfolio_settings_show_logged_only_callback() {
+	$settings  = get_option( 'portfolio_settings' );
+	$checked = isset( $settings['show_logged_only'] ) ? $settings['show_logged_only'] : false;
+
+	?>
+		<input id="portfolio-settings-show-logged-only" name="portfolio_settings[show_logged_only]" type="checkbox" value="true" <?php checked( $checked ); ?>/> 
+		<label for="portfolio-settings-show-logged-only"><?php _e( 'Only show projects to logged-in users', 'portfolio' ); ?></label>
+	<?php
+}
+
+// Función de sanitización para nuestro campo.
+function portfolio_sanitize_show_logged_only( $data ) {
+	// Chequeamos si el valor ingresado está permitido. Si lo está, mostramos proyectos solo a usuarios registrados.
+	$accepted_values = array( true, 'true' );
+	$show_logged_only = in_array( $data, $accepted_values );
+
+	return $show_logged_only;
+}
+```
+
+Con este código ya podemos guardar nuestros datos automáticamente, sin necesidad de interactuar de manera directa con la *Options API* ni de chequear nonces. Sin embargo, todavía no podemos usarlo, porque lo que hicimos aún no se ve reflejado en la página de administración. Para eso necesitamos modificar nuestra función `portfolio_menu_page()` de la siguiente manera:
+
+```php
+<?php
+function portfolio_menu_page() {
+	?>
+		<form action="options.php" method="POST">
+			<?php settings_fields( 'portfolio_settings' ); // Imprime el HTML necesario para las validaciones. ?>
+			<?php do_settings_sections( 'portfolio-general-settings-section' ); // Imprime nuestra sección y los campos asociados. ?>
+			<?php submit_button(); // Imprime el botón de confirmación. ?>
+		</form>
+	<?php
+}
+```
+
+Una vez que actualizamos a este código, pasan varias cosas: nuestra antigua función de guardado, `portfolio_save_settings()` ya no se usa más, ya que todas las validaciones son hechas por la Settings API, y podemos eliminarla tranquilos. También contamos con más funciones que antes, pero más chicas y más fáciles de mantener. Además, la sanitización de datos está desacoplada del proceso de guardado. Como toda la registración de secciones y de campos es manejada internamente por WordPress, con mirar un poco la documentación oficial de la API y sus otras funciones podemos ver que es muy fácil mostrar o no mostrar nuevas opciones condicionalmente, según el contexto en el que estemos, qué usuario está viendo la página, en qué menú estamos, etc. Es una mejora sustancial sobre el método anterior, con el que las cosas no se podían hacer de manera tan automática.
