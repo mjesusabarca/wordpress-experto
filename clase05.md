@@ -1,3 +1,7 @@
+[Paradigma funcional (2)]
+
+---
+
 # Custom Fields y Meta Boxes
 
 La manera más rápida de agregar valores extra a los contenidos de un sitio es por medio del uso de campos personalizados, o *Custom Fields*. Estos campos personalizados se hacen visibles en la pantalla de creación o edición de un contenido cuando se chequea el campo correspondiente en *Opciones de Pantalla*. Esto va a hacer que WordPress muestre un menú en el que se puede agregar un nuevo campo con un nombre a elección y su correspondiente valor.
