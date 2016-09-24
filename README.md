@@ -58,6 +58,7 @@
     * Acciones
     * Filtros
     * Eventos en themes
+    * Creación de shortcodes
     * Creación de sidebars
     * Creación de menús de navegación
   * Intro a Plugins
