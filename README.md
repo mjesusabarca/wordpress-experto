@@ -1,14 +1,18 @@
 # WordPress Nivel 2
 
+## Destinatarios
+
+El curso está dirigido a alumnos que cuenten con conocimientos de WordPress desde una perspectiva de usuario (instalación, utilización de panel de control, plugins y themes) y deseen profundizar en la creación de sus propias extensiones a través de la incorporación de conocimientos de programación con PHP y JavaScript.
+
 ## Pre-requisitos:
 
 * Manejo de WordPress a nivel usuario (temas de WordPress Nivel 1 o equivalente)
 * Completar el curso de [HTML y CSS de Codecademy]  (<https://www.codecademy.com/learn/web>)
 * Completar el curso de [PHP de Codecademy]  (<https://www.codecademy.com/es/learn/php>)
 
-------------
+## Programa:
 
-## Clase 1: Herramientas, HTML, CSS y templates
+### [Clase 1: Herramientas, HTML, CSS y templates](clase01.md)
 
   * Herramientas
     * Servidores locales: XAMPP, LAMP, MAMP, WAMP, etc.
@@ -29,7 +33,7 @@
     * Inspector de código en Chrome y Firefox
   * Trabajo Práctico :white_check_mark:
  
-## Clase 2: PHP y themes
+### [Clase 2: PHP y themes](clase02.md)
 
   * Intro a PHP
     * Propósito
@@ -46,12 +50,12 @@
     * Carga de estilos y scripts
   * Trabajo Práctico :white_check_mark:
   
-## Clase 3: Paradigma funcional, plugins y programación orientada a eventos
+### [Clase 3: Paradigma funcional, plugins y programación orientada a eventos](clase03.md)
 
   * Paradigma funcional (I)
     * Funciones
     * Pluggable functions
-    * Carga de archivos (include y require)
+    * Carga de archivos (`include` y `require`)
     * Variables globales
   * Programación orientada a eventos
     * Plugin API
@@ -67,7 +71,7 @@
     * Taxonomías
   * Trabajo Práctico :white_check_mark:
 
-## Clase 4: Manejo de datos en PHP y MySQL
+### [Clase 4: Manejo de datos en PHP y MySQL](clase04.md)
 
   * Manejo de datos en PHP
     * Creación de formularios
@@ -86,7 +90,7 @@
     * Manejo de bases de datos en WordPress
   * Trabajo Práctico :white_check_mark:
  
-## Clase 5: Paradigma funcional, post types y opciones personalizadas
+### [Clase 5: Paradigma funcional, post types y opciones personalizadas](clase05.md)
 
   * Paradigma funcional (II)
     * Funciones anónimas
@@ -100,7 +104,7 @@
     * Settings API
   * Trabajo Práctico :white_check_mark:
     
-## Clase 6: Programación orientada a objetos y más
+### [Clase 6: Programación orientada a objetos, loops y widgets](clase06.md)
 
   * Programación orientada a objetos
     * Clases
@@ -117,10 +121,8 @@
     * Clase `WP_Widget`
     * Construcción de widgets propios
   * Trabajo Práctico :white_check_mark:
- 
---------------
 
-## Clase 7: Workshop, traducción y JavaScript :large_blue_circle:
+### [Clase 7: Workshop, traducción y JavaScript](clase07.md) :large_blue_circle:
 
   * Workshop
     * Creación/optimización de theme o plugin propio según los temas tratados en clase 
@@ -136,9 +138,7 @@
     * Uso de jQuery (paradigma de eventos)
     * Impacto de JavaScript en front-end
 
---------------
- 
-## Clase 8: Proyecto final y asincronismo :checkered_flag:
+### [Clase 8: Proyecto final y asincronismo](clase08.md) :checkered_flag:
 
   * Proyecto final
     * Finalización de theme o plugin propio según los temas tratados en clase 
@@ -149,5 +149,3 @@
     * Procesamiento y devolución de datos
     * Uso nativo de AJAX
     * Uso de AJAX en WordPress
-
-----------------
