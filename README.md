@@ -53,14 +53,17 @@
     * Pluggable functions
     * Carga de archivos (include y require)
     * Variables globales
-  * Intro a Plugins
-    * Creación y declaración
-    * Custom Post Types
-    * Taxonomías
   * Programación orientada a eventos
     * Plugin API
     * Acciones
     * Filtros
+    * Eventos en themes
+    * Creación de sidebars
+    * Creación de menús de navegación
+  * Intro a Plugins
+    * Creación y declaración
+    * Custom Post Types
+    * Taxonomías
   * Trabajo Práctico :white_check_mark:
 
 ## Clase 4: Manejo de datos en PHP y MySQL
