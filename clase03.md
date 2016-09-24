@@ -1,3 +1,439 @@
+[Paradigma funcional]
+
+---
+
+# Programación Orientada a Eventos
+
+Un primer paso muy recomendable para empezar a entender cómo funciona WordPress a nivel código, independientemente de si trabajamos con plugins o themes, es empezar a entender el paradigma de programación orientada a eventos, ya que en él se basan la mayoría de las posibilidades de extensión que tenemos disponibles. Es importantísimo conocer este paradigma a la hora de interactuar con el código de WordPress, ya que desconocerlo puede llevar a muchísimo trabajo innecesario, o a mucho tiempo perdido en mantenimiento, mejoras y arreglo de bugs.
+
+### ¿Qué es la programación orientada a eventos?
+
+La herramienta principal que nos ofrece WordPress para construir nuestras propias extensiones, ya se trate de plugins o themes, es un conjunto de funciones al que comúnmente se llama *[Plugin API](https://codex.wordpress.org/Plugin_API)*.
+
+Esta API está basada en el ya mencionado paradigma de [Programación Orientada a Eventos](https://en.wikipedia.org/wiki/Event-driven_programming), o Programación Basada en Eventos (en inglés, *Event-oriented programming* o *Event-driven programming*). Es combinable con otros paradigmas populares, como el estructurado, el orientado a objetos y el funcional, y tiene unos conceptos fundamentales muy sencillos.
+
+Este paradigma es extremadamente útil cuando necesitamos que un proceso se ejecute en algún punto determinado, pero tenemos un acceso limitado al código que se encuentra en ese punto. Al trabajar con WordPress es casi inevitable usar el paradigma, porque no podemos modificar libremente el código que descargamos sin perder lo que hayamos hecho cuando necesitemos actualizar la versión. Si ya trabajaron con jQuery, probablemente hayan visto el paradigma de eventos al usar los métodos `trigger()` y `bind()`.
+
+El paradigma de eventos dicta que, en ciertos lugares puntuales de nuestro programa, van a ocurrir determinados eventos o "sucesos". Estos eventos, por sí mismos, no hacen nada. Podríamos decir que son simples contenedores, porque solamente van a empezar a tener algún efecto sobre nuestra aplicación cuando les asignemos procesos, es decir cuando indiquemos que al ocurrir un determinado evento tiene que ejecutarse un proceso determinado.
+
+Normalmente, vamos a tener en alguna parte de nuestro código la ejecución de un evento con un nombre determinado. Supongamos que tenemos un evento llamado `mesa_servida`.
+
+```php
+<?php
+evento( 'mesa_servida' );
+```
+
+Por otra parte, vamos a necesitar que, al ocurrir ese evento, también se ejecute un proceso. Vamos a suponer que, al ocurrir el evento `mesa_servida`, queremos que se procese la función `sentarse_a_comer()`. Para eso, necesitamos que la función haya sido declarada antes de que ocurra el evento.
+
+```php
+<?php
+function sentarse_a_comer() {
+	echo 'a comer!';
+}
+
+evento( 'mesa_servida' );
+```
+
+Sin embargo, ese código por sí mismo todavía no hace nada. Para que la función se procese en el momento en el que se ejecuta el evento, necesitamos asignar la función al evento.
+
+```php
+<?php
+function sentarse_a_comer() {
+	echo 'a comer!';
+}
+
+asignar_proceso( 'mesa_servida', 'sentarse_a_comer' );
+
+evento( 'mesa_servida' ); // Se imprime "a comer!"
+```
+
+De esta manera, al usar `asignar_proceso()` con el nombre del evento como primer parámetro y el nombre de la función como segundo parámetro (lo cual se llama *callback*), indicamos que, al ocurrir el evento `mesa_servida`, va a procesarse el código declarado dentro de la función `sentarse_a_comer`. La función asignada a un evento es lo que dentro de este paradigma se suele llamar *hook*.
+
+El importante notar que, al menos en PHP, no es necesario que la función exista antes de asignarla a un evento, pero sí tiene que haber sido declarada antes de que el evento ocurra. La misma asignación también tiene que hacerse antes de que ocurra el evento. De esta manera, el siguiente código es equivalente al anterior:
+
+```php
+<?php
+asignar_proceso( 'mesa_servida', 'sentarse_a_comer' );
+
+function sentarse_a_comer() {
+	echo 'a comer!';
+}
+
+evento( 'mesa_servida' );
+```
+
+Ahora bien, conociendo los conceptos fundamentales de la programación orientada a eventos, podemos ver de qué manera WordPress nos permite aplicarlos para construir nuestras extensiones. Para esto, WordPress nos ofrece dos diferentes tipos de eventos: acciones y filtros.
+
+### Acciones
+
+Uno de los dos tipos de eventos ofrecidos por WordPress se llama ***[Action](https://codex.wordpress.org/Plugin_API#Actions)***, o acción. El propósito de las acciones es permitir la ejecución de procesos propios durante la carga de una página. Algunos ejemplos de estos procesos pueden consistir en modificar información de la base de datos, enviar un mail, registrar nuevos tipos de contenido, imprimir cierta información en pantalla, etc.
+
+La interacción básica entre eventos y procesos es muy similar a los ejemplos que acabamos de ver. Las acciones se ejecutan por medio de la función `do_action()`, mientras los hooks se registran usando `add_action()`.
+
+```php
+<?php
+add_action( 'mesa_servida', 'sentarse_a_comer' );
+
+function sentarse_a_comer() {
+	echo 'a comer!';
+}
+
+do_action( 'mesa_servida' );
+```
+
+Sin embargo, este uso básico a veces puede resultar un poco limitado. Por ejemplo, es posible que queramos añadir un segundo hook a `mesa_servida`, y necesitemos especificar cuál de ellos va a ejecutarse primero. Supongamos que introducimos la función `comer()`, y queremos que se ejecute inmediatamente después de `sentarse_a_comer()`.
+
+```php
+<?php
+add_action( 'mesa_servida', 'comer' );
+
+function comer() {
+	echo 'comiendo ...';
+}
+
+add_action( 'mesa_servida', 'sentarse_a_comer' );
+
+function sentarse_a_comer() {
+	echo 'a comer!';
+}
+
+do_action( 'mesa_servida' );
+```
+
+Con este código, la función `comer()` siempre se va a ejecutar antes de `sentarse_a_comer()`. Si no tenemos la posibilidad de cambiar la ubicación de la asignación de `add_action( 'mesa_servida', 'comer' )`, necesitamos encontrar una manera de hacer que `comer()` se ejecute después de `sentarse_a_comer()`. Para este tipo de necesidades, la función `add_action()` admite un tercer parámetro llamado `$priority`, en el cual se especifica un valor numérico. Los hooks con valores menores van a ser ejecutados con anterioridad a los hooks con valores más altos, y el valor por defecto es 10. Teniendo esto en cuenta, podemos modificar nuestro código de esta manera.
+
+```php
+<?php
+add_action( 'mesa_servida', 'comer', 20 );
+
+function comer() {
+	echo 'comiendo ...';
+}
+
+add_action( 'mesa_servida', 'sentarse_a_comer', 10 );
+
+function sentarse_a_comer() {
+	echo 'a comer!';
+}
+
+do_action( 'mesa_servida' );
+// Se imprime "a comer!"
+// Se imprime "comiendo ..."tax
+```
+
+Puede pasar, también, que dentro de las funciones que usamos como hooks necesitemos algún tipo de información contextual con respecto al momento en el que se ejecuta la acción. Supongamos que dentro de `sentarse_a_comer()` necesitamos evaluar cuántos comensales vamos a tener.
+
+```php
+<?php
+add_action( 'mesa_servida', 'sentarse_a_comer', 10 );
+
+function sentarse_a_comer( $comensales ) {
+	if ( $comensales < 5 ) {
+		echo 'a comer!';
+	} else {
+		echo 'acá hay demasiada gente, Roberto!'
+	}
+}
+
+$comensales = 10;
+
+do_action( 'mesa_servida' );
+// Se imprime "a comer!"
+```
+
+De alguna manera necesitamos hacer que ese número de comensales declarado en el mismo contexto de ejecución de `do_action( 'mesa_servida' )` llegue a la función `sentarse_a_comer()`. Para esto podemos adjuntar a `do_action()` todas las variables que queramos, y en `add_action()` especificar, en un cuarto parámetro llamado `$accepted_args`, el número de parámetros que va a recibir nuestro hook.
+
+```php
+<?php
+add_action( 'mesa_servida', 'sentarse_a_comer', 10, 1 );
+
+function sentarse_a_comer( $comensales ) {
+	if ( $comensales < 5 ) {
+		echo 'a comer!';
+	} else {
+		echo 'acá hay demasiada gente, Roberto!';
+	}
+}
+
+$comensales = 10;
+
+do_action( 'mesa_servida' , $comensales );
+// Se imprime "acá hay demasiada gente, Roberto!"
+```
+
+El valor por defecto de `$accepted_args` es 1, por lo cual, si vamos a tener un solo parámetro, podemos incluso no especificar este valor.
+
+```php
+<?php
+add_action( 'mesa_servida', 'sentarse_a_comer', 10 );
+
+function sentarse_a_comer( $comensales ) {
+	if ( $comensales < 5 ) {
+		echo 'a comer!';
+	} else {
+		echo 'acá hay demasiada gente, Roberto!';
+	}
+}
+
+$comensales = 10;
+
+do_action( 'mesa_servida' , $comensales );
+// Se imprime "acá hay demasiada gente, Roberto!"
+```
+
+Sin embargo, podemos pasarle a `do_action()` tantos parámetros como necesitemos en nuestra función, pero siempre especificando la cantidad en `add_action()`, en caso de que sea más de uno.
+
+```php
+<?php
+add_action( 'mesa_servida', 'sentarse_a_comer', 10, 2 );
+
+function sentarse_a_comer( $comensales, $comida ) {
+	if ( $comensales < 5 ) {
+		echo 'A comer!';
+	} else {
+		echo 'Acá hay demasiada gente, Roberto! Tenemos solamente ' . $comida;
+	}
+}
+
+$comensales = 10;
+$comida = 'Fideos con pesto';
+
+do_action( 'mesa_servida' , $comensales, $comida );
+// Se imprime "acá hay demasiada gente, Roberto! Tenemos solamente fideos con pesto"
+```
+
+Sabiendo cómo opera este tipo de evento, también podemos agregar hooks a las acciones nativas de WordPress. Por ejemplo, podemos mandarle un mail al administrador del sitio cada vez que se publique un nuevo post. Para esto, definimos la función que envía el mail, y se la asignamos como hook a la acción `publish_post`.
+
+```php
+<?php
+add_action( 'publish_posts' ,'avisar_amigos' );
+
+function avisar_amigos() {
+    $amigos = 'juan@example.org,pedro@example.org';
+
+    mail( $amigos, 'Actualización de blog', 'Acabo de actualizar mi blog: http://blog.example.com' );
+}
+```
+
+Una vez que activemos este nuevo plugin y publiquemos un nuevo post, vamos a poder ver que llega un nuevo mail a la casilla de correo del administrador.
+
+Noten que no estamos llamando directamente a `do_action( 'publish_posts' );`. Esto es porque ese llamado se va a estar haciendo en algún lugar del código de base de WordPress, que llamamos Core. WordPress cuenta con una [lista](http://codex.wordpress.org/Plugin_API/Action_Reference) bastante larga de acciones propias a las que podemos asignar nuestros propios hooks, que nos pueden servir a manera de guía.
+
+- - -
+
+### Filtros
+
+El otro tipo de eventos que nos ofrece WordPress son los ***[Filters](https://codex.wordpress.org/Plugin_API#Filters)***, o filtros. Este tipo de eventos ya no pone tanto el foco en la ejecución de procesos, como pasa con las acciones, sino en la manipulación de datos internos de la aplicación. Por ejemplo, un filtro puede ser utilizado para cambiar el valor de una variable, o modificar el valor de retorno de una función. Usos típicos de los filtros pueden ser activar o desactivar ciertas características de la aplicación, modificar alguna parte del HTML que se va a imprimir, cambiar valores de configuración o alterar consultas a la base de datos.
+
+Una característica importante de los filtros es que siempre tienen un valor de retorno, a diferencia de las acciones. Debido a esto, los filtros siempre están asignados a una variable, a una evaluación o a un valor de retorno de una función o método.
+
+Teniendo en cuenta esta diferencia, su uso es muy similar al de las acciones. En algún punto de nuestro código vamos a tener un llamado a la función `apply_filters()`, que es equivalente a `do_action()`. Los parámetros que va a recibir esta función son el nombre del evento y el valor que va a tener por defecto.
+
+```php
+<?php
+$comensales = apply_filters( 'cantidad_de_comensales', 10 );
+```
+
+Ahora bien, antes de que ese código se ejecute, necesitamos definir cuáles van a ser los filtros que se asignen al evento. Esto podemos hacerlo a través de la función `add_filter()`.
+
+```php
+<?php
+add_filter( 'cantidad_de_comensales', 'nueva_cantidad_de_comensales' );
+
+function nueva_cantidad_de_comensales( $comensales ) {
+	if ( viene_ramon() ) {
+		$comensales++;
+	}
+
+	return $comensales;
+}
+
+$comensales = apply_filters( 'cantidad_de_comensales', 10 );
+```
+
+De esta manera, al momento de definirse la variable `$comensales`, el valor por defecto (10) se le va a pasar a la función `nueva_cantidad_de_comensales()`, y va a sumar 1 en caso de que Ramón venga (dando por resultado 11). Noten que antes de finalizar la función que opera como filtro siempre necesitamos devolver un valor; de lo contrario el valor que estemos filtrando va a terminar siendo `null`.
+
+Los filtros, al igual que las acciones, pueden recibir prioridad de ejecución (`$priority`) y número de argumentos (`$accepted_args`) como tercer y cuarto parámetro, respectivamente.
+
+```php
+<?php
+add_filter( 'cantidad_de_comensales', 'descartar_vegetarianos', 20, 2 );
+
+function descartar_vegetarianos( $comensales, $comida ) {
+	if ( 'asado' == $comida && viene_jose() ) {
+		$comensales--;
+	}
+
+	return $comensales;
+}
+
+add_filter( 'cantidad_de_comensales', 'nueva_cantidad_de_comensales', 10 );
+
+function nueva_cantidad_de_comensales( $comensales ) {
+	if ( viene_ramon() ) {
+		$comensales++;
+	}
+
+	return $comensales;
+}
+
+$comida = 'asado';
+$comensales = apply_filters( 'cantidad_de_comensales', 10, $comida );
+```
+
+De esta forma, el primer filtro a ejecutarse va a ser `nueva_cantidad_de_comensales()`, por más que se haya declarado en segundo lugar. No necesitamos especificar la cantidad de argumentos para ese filtro, porque el valor por defecto es 1, y solamente necesitamos la primera variable, `$comensales`. En segundo lugar se va a ejecutar la función `descartar_vegetarianos()`, que va a restar un comensal en caso de que la comida sea asado y venga José. Al asignar este filtro sí especificamos que vamos a recibir dos parámetros, ya que necesitamos las variables `$comensales` y `$comida`, que se están pasando al filtro por medio de `apply_filters()`.
+
+Al igual que pasa con las acciones, también tenemos muchos filtros que vienen con WordPress por defecto. Uno de ellos es `the_content`, que se aplica al contenido de cada post o página antes de ser impreso. Supongamos que queremos modificar levemente este contenido. Para eso podemos hacer algo así:
+
+```php
+<?php
+add_filter( 'the_content', 'modify_post_content' );
+
+function modify_post_content( $content ) {
+	if ( is_single() ) {
+		$content = '<p>Esto es un post.</p>' . $content;
+	}
+
+	return $content;
+}
+```
+
+Una vez que guardemos este código en nuestro plugin y refresquemos cualquier página correspondiente a un post, vamos a ver el texto que agregamos en nuestra función inmediatamente arriba del resto del contenido.
+
+- - -
+
+### Remover eventos del registro
+
+Algo que podemos llegar a necesitar mientras desarrollamos nuestras propias extensiones es que ciertas acciones o filtros se dejen de ejecutar. Por ejemplo, podemos querer desactivar alguna funcionalidad nativa de WordPress, o de un plugin de terceros, o que alguna de nuestras acciones o filtros solamente se ejecuten en determinados contextos. Para lograr eso, WordPress nos ofrece cuatro funciones:
+
+* `remove_action()`
+* `remove_filter()`
+* `remove_all_actions()`
+* `remove_all_filters()`
+
+Cuando asignamos un filtro o una acción a un evento, WordPress lo guarda en una lista, más específicamente en la variable global `$wp_filters`, donde también queda el detalle de sus prioridades y la cantidad de argumentos que acepta. Lo que nos permiten estas funciones es remover de esa lista los procesos que necesitemos.
+
+Por ejemplo, supongamos que tenemos dos eventos, una acción y un filtro, y a cada uno de ellos queremos asignarle una función.
+
+```php
+<?php
+add_action( 'my_action', 'my_action_callback', 10, 1 );
+
+function my_action_callback() {
+	echo 'Hello world!';
+}
+
+add_filter( 'my_filter', 'my_filter_callback', 10, 1 );
+
+function my_filter_callback( $value ) {
+	return 'some other value';
+}
+
+do_action( 'my_action' );
+
+$my_value = apply_filters( 'my_filter', 'some value' );
+```
+
+Sin embargo, en algún punto en el futuro vamos a necesitar que esas funciones que asignamos dejen de ejecutarse, pero por las características de nuestra extensión no podemos remover ni las asignaciones ni las declaraciones de funciones. No podemos simplemente remover código. En ese punto es donde necesitamos usar estas nuevas funciones de las que venimos hablando.
+
+```php
+<?php
+add_action( 'my_action', 'my_action_callback', 20, 1 );
+
+function my_action_callback() {
+	echo 'Hello world!';
+}
+
+add_filter( 'my_filter', 'my_filter_callback', 20, 1 );
+
+function my_filter_callback( $value ) {
+	return 'some other value';
+}
+
+remove_action( 'my_action', 'my_action_callback', 20 );
+remove_filter( 'my_filter', 'my_filter_callback', 20 );
+
+do_action( 'my_action' );
+
+$my_value = apply_filters( 'my_filter', 'some value' );
+```
+
+De esta manera logramos que las funciones que asignamos previamente con `add_action()` y `add_filter()` dejen de ejecutarse. 
+Para usar correctamente `remove_action()` y `remove_filter()` necesitamos tener en cuenta dos cosas: en primer lugar, tienen que ser llamadas después de que los callbacks hayan sido asignados, pero antes de que se ejecuten las acciones. En segundo lugar, ambas funciones reciben un tercer parámetro, que es equivalente a la prioridad con la que se asignaron previamente los callbacks que ahora estamos removiendo del registro. Este parámetro no es obligatorio, y su valor por defecto es 10. Si no lo especificamos, tenemos que asegurarnos de que la prioridad del callback también sea 10, o que tampoco esté especificada.
+
+Por último, tenemos las funciones `remove_all_actions()` y `remove_all_filters()`. Estas nos permiten remover todos los callbacks que hayan sido asignados a una acción o filtro determinados, sin necesidad de especificar más que el nombre del evento. Por ejemplo, podemos suponer que tenemos dos callbacks asignados a una acción y otros dos callbacks asignados a un filtro.
+
+```php
+<?php
+add_action( 'my_action', 'my_action_callback', 10 );
+add_action( 'my_action', 'my_other_callback', 20 );
+
+function my_action_callback() {
+	echo 'Hello world!';
+}
+
+function my_other_action_callback() {
+	echo 'Hello again!';
+}
+
+add_filter( 'my_filter', 'my_filter_callback', 10, 1 );
+add_filter( 'my_filter', 'my_other_filter_callback', 20, 1 );
+
+function my_filter_callback( $value ) {
+	return 'some other value';
+}
+
+function my_other_filter_callback( $value ) {
+	return 'some other different value';
+}
+
+do_action( 'my_action' );
+
+$my_value = apply_filters( 'my_filter', 'some value' );
+```
+
+Podemos remover muy fácilmente todos los callbacks para cada evento haciendo algo así:
+
+```php
+<?php
+add_action( 'my_action', 'my_action_callback', 10 );
+add_action( 'my_action', 'my_other_callback', 20 );
+
+function my_action_callback() {
+	echo 'Hello world!';
+}
+
+function my_other_action_callback() {
+	echo 'Hello again!';
+}
+
+add_filter( 'my_filter', 'my_filter_callback', 10, 1 );
+add_filter( 'my_filter', 'my_other_filter_callback', 20, 1 );
+
+function my_filter_callback( $value ) {
+	return 'some other value';
+}
+
+function my_other_filter_callback( $value ) {
+	return 'some other different value';
+}
+
+remove_all_actions( 'my_action' );
+remove_all_filters( 'my_filter' );
+
+do_action( 'my_action' );
+
+$my_value = apply_filters( 'my_filter', 'some value' );
+```
+
+Tenemos que tener en cuenta que ambas son funciones para usar con mucho cuidado, ya que no es muy común querer remover todos los callbacks para un evento. Sin embargo, es bueno saber que contamos con ellas, y suelen ser muy útiles mientras estamos desarrollando nuestras extensiones, particularmente con fines de testing.
+
+### Conclusiones
+
+Un buen manejo y comprensión de la Plugin API permiten agregarle a WordPress cualquier tipo de funcionalidad que pretendamos. Pero más allá del trabajo que podemos hacer con WordPress, dominar el paradigma de programación orientada a eventos puede abrirnos muchas puertas en el mundo del desarrollo de software en general, y en particular en el desarrollo web, donde se demuestra cada vez más útil, siendo adoptado por muchos otros proyectos open source, como jQuery, Drupal o Symfony.
+
+---
+
 # Sidebars
 
 Podemos crear barras laterales para un theme mediante una serie de funciones. Las funciones listadas a continuación  se utilizan para añadir barras laterales funcionales al tema.
@@ -147,200 +583,3 @@ function portfolio_create_project_post_type() {
 Para crear un nuevo post type, vamos a usar la función `register_post_type()` al momento de ejecutarse el evento `init`. La función va a recibir dos parámetros: el primero es el nombre interno del post type, y el segundo es un array conteniendo su descripción. Dentro de este array podemos usar una serie de valores bastante completa, a partir de los cuales nuestro post type va a contar o no con ciertas características. Todos estos valores se describen con detalle en la [documentación oficial de la función](https://codex.wordpress.org/Function_Reference/register_post_type), y en este momento solamente vamos a usar aquellos que nos van a permitir que nuestros proyectos se vean de la manera más similar posible a un post. Vamos a definir el nombre del post type en plural y en singular, vamos a indicar cuáles de los campos predefinidos por WordPress necesitamos, y a indicar que las entradas que generemos puedan verse desde la parte pública de nuestro sitio, y también a través de una página de archivo.
 
 De esta manera, cuando guardemos nuestro código, vamos a ver una nueva sección en el menú de administración: ***Projects***. Podemos cargar un nuevo proyecto, con su correspondiente título, contenido, extracto, autor e imagen destacada, y una vez que lo guardemos WordPress nos va a dar un link para visualizarlo en el front-end. Si todo anduvo bien, deberíamos ver algo muy parecido a un post, quizás con algunas diferencias menores, dependiendo del theme que estemos usando.
-
-# Taxonomías
-
-Los posts cuentan con dos tipos de taxonomías para organizar contenidos: las categorías y las etiquetas (o tags). La diferencia fundamental entre estos dos tipos de taxonomías es que las categorías pueden organizarse jerárquicamente, es decir que puede haber categorías principales, y además otras secundarias que las tengan como padres, mientras que las etiquetas están siempre al mismo nivel.
-
-El problema con el que nos encontramos al trabajar con *custom post types* es que no tenemos disponibles por defecto esas dos taxonomías para ordenar nuestros nuevos contenidos. Para hacerlo necesitamos crear taxonomías propias. Y con ese fin es que WordPress ofrece la función `register_taxonomy()`.
-
-Usarla es muy sencillo: como primer parámetro necesitamos el nombre que va a tener nuestra nueva taxonomía (podemos usar *"Category"*, *"Tag"*, o cualquier otro que se nos ocurra); en el segundo parámetro debemos especificar el nombre del post type al que la vamos a aplicar (o un array de post types, si vamos a aplicarla a más de uno); y nuestro tercer parámetro (opcional) es una lista de argumentos con las características de la taxonomía. Entre ellos, si va a ser jerárquica o no, y una lista de textos que WordPress va a mostrar en diferentes partes del sitio web cuando se use la taxonomía. El detalle de todo lo que se puede usar dentro de estos parámetros se puede ver en la [documentación oficial](https://codex.wordpress.org/Function_Reference/register_taxonomy).
-
-Vamos a agregar, entonces, dos taxonomías: una que se comporte de la misma manera que las categorías de posts, y otra que se comporte como las etiquetas.
-
-```php
-<?php
-add_action( 'init', 'portfolio_register_category_taxonomy' );
-
-function portfolio_register_category_taxonomy() {
-	register_taxonomy( 'project_category', 'project' , array(
-			'labels' => array(
-				'name'          => __( 'Categories', 'portfolio' ),
-				'singular_name' => __( 'Category', 'portfolio' ),
-			),
-            'hierarchical' => true,
-		) 
-	);
-}
-
-add_action( 'init', 'portfolio_register_tag_taxonomy' );
-
-function portfolio_register_tag_taxonomy() {
-    register_taxonomy( 'project_tag', 'project' , array(
-            'labels' => array(
-                'name'          => __( 'Tags', 'portfolio' ),
-                'singular_name' => __( 'Tag', 'portfolio' ),
-            ),
-            'hierarchical' => false,
-        ) 
-    );
-}
-
-```
-
-Al guardar el código y recargar la sección de administración, vamos a ver que bajo la sección *Projects* aparecen dos nuevos links: *Categories* y *Tags*. Accediendo a cada uno de ellos vamos a poder crear nuestras propias categorías y etiquetas, y asignárselas a nuestros proyectos. Estos nuevos datos que ingresamos como categorías y etiquetas son manejados por WordPress internamente como términos, o *terms*, y podemos ver la lista completa de funciones relacionadas con términos en la [documentación de la función `get_term()`](https://codex.wordpress.org/Function_Reference/get_term).
-
-Con esto ya podemos asignar categorías y etiquetas a nuestros proyectos, pero todavía no podemos verlas en el front-end del sitio. Para resolver esto, una posible solución es filtrar la información del evento `the_content`.
-
-```php
-<?php
-add_filter( 'the_content', 'portfolio_project_categories', 20 );
-
-function portfolio_project_categories( $content ) {
-	if ( taxonomy_exists( 'project_category' ) ) {
-		$taxonomy = get_taxonomy( 'project_category' );
-		$terms    = get_the_terms( get_the_ID(), 'project_category' );
-
-		if ( is_array( $terms ) ) {
-			$category_links = array();
- 
-			 foreach ( $terms as $term ) {
-				 $category_links[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . $term->name . '</a>';
-			 }
-
-			$categories = join( ', ', $category_links );
-
-			$content .= '<div class="portfolio-project-taxonomy"><strong>' . $taxonomy['labels']['name'] . '</strong> ' . $categories . '</div>';
-		}
-	}
-
-	return $content;
-}
-
-add_filter( 'the_content', 'portfolio_project_categories', 30 );
-
-function portfolio_project_tags( $content ) {
-	if ( taxonomy_exists( 'project_tag' ) ) {
-		$taxonomy = get_taxonomy( 'project_tag' );
-		$terms    = get_the_terms( get_the_ID(), 'project_tag' );
-
-		if ( is_array( $terms ) ) {
-			$tag_links = array();
- 
-			 foreach ( $terms as $term ) {
-				 $tag_links[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . $term->name . '</a>';
-			 }
-
-			$tags = join( ', ', $tag_links );
-
-			$content .= '<div class="portfolio-project-taxonomy"><strong>' . $taxonomy['labels']['name'] . '</strong> ' . $tags . '</div>';
-		}
-	}
-
-	return $content;
-}
-```
-
-Lo que hacemos en ambas funciones es chequear si la taxonomía ya existe. En caso afirmativo, obtenemos sus datos y la lista de términos que hayan sido creados bajo dicha taxonomía. A continuación construimos el código HTML que se va a agregar al contenido del proyecto, incluyendo el nombre de la taxonomía (*Category* y *Tag*) y una lista con los nombres de todos los términos creados para la misma, cada uno enlazando a su respectivas página de archivo. Una vez armada la pieza de código HTML, la agregamos al final del contenido original del post.
-
-# Internacionalización y Localización
-
-Una posibilidad que WordPress ofrece al hacer la instalación es elegir el lenguaje en el que se va a mostrar nuestro sitio. Gracias a esta opción, si se selecciona un lenguaje que no sea inglés, WordPress va a traducir automáticamente todos los textos que estén preparados para ser mostrados en el idioma elegido.
-
-Una recomendación típica de extensibilidad es que todos los textos escritos en el código de plugins y themes sean traducibles, es decir que deben ser internacionalizados. De esta manera, alguien que quiera traducir un plugin internacionalizado a su propio idioma va a poder hacerlo simplemente siguiendo unos pocos pasos.
-
-Para que un plugin pueda ser traducido hacen falta dos cosas: en primer lugar, contar con una palabra clave para que los textos que introducidos puedan ser reconocidos como propios del plugin; en segundo lugar que los textos sean invocados con las funciones de localización que provee WordPress. Adicionalmente se puede ofrecer una plantilla para traducciones. Esto no es obligatorio, pero resulta muy útil para los traductores.
-
-El requisito de la palabra clave es el más sencillo de cumplir: basta con agregarla como dato en el encabezado del plugin, bajo el nombre "Text Domain". Por convención, el nombre del dominio suele ser igual al del plugin, pero en minúsculas y con los espacios separados por guiones. Este valor también suele ser igual al nombre de la carpeta del plugin.
-
-```php
-<?php
-/*
- * Plugin Name: My Plugin
- * Text Domain: my-plugin
- */
-```
-
-Opcionalmente, se puede especificar, en el valor "Domain Path", la ruta relativa a la carpeta donde se encuentren los archivos de traducción que podamos ofrecer por defecto.
-
-```php
-<?php
-/*
- * Plugin Name: My Plugin
- * Text Domain: my-plugin
- * Domain Path: languages/
- */
-```
-
-Una vez que la tenemos, debemos usar la función `load_textdomain()` para que se carguen automáticamente todas las posibles traducciones existentes de nuestro plugin.
-
-```php
-<?php
-/*
- * Plugin Name: My Plugin
- * Text Domain: my-plugin
- * Domain Path: languages/
- */
-
-load_plugin_textdomain( 'my-plugin' );
-```
-
-Las funciones de localización son varias, aunque las más comunes son `__()` y `_e()`. `__()` devuelve la traducción del texto que se le pasa como primer parámetro, mientras que `_e()` la imprime. Cada vez que se las llame se debe especificar, como segundo parámetro, el dominio al cual pertenece el texto a traducir. Teniendo eso en cuenta, puede retomarse alguno de los ejemplos de código anteriores e internacionalizarlo.
-
-```php
-<?php
-/*
- * Plugin Name: My Plugin
- * Text Domain: my-plugin
- * Domain Path: languages/
- */
-
-load_plugin_textdomain( 'my-plugin' );
-
-add_action( 'my_action', 'my_action_callback', 20, 1 );
-
-function my_action_callback() {
-	_e( 'Hello world!', 'my-plugin' );
-}
-
-add_filter( 'my_filter', 'my_filter_callback', 20, 1 );
-
-function my_filter_callback( $value ) {
-	return __( 'some other value', 'my-plugin' );
-}
-
-$my_value = apply_filters( 'my_filter', 'some value' );
-
-do_action( 'my_action' );
-```
-
-Un problema con el que es común encontrarse es que parte del texto a traducir dependa de valores variables. Esto es justamente un problema porque `gettext`, la librería que usa WordPress para gestionar sus traducciones, no puede leer información dinámica dentro de las cadenas de texto a traducir. Por lo tanto, algo así no puede ser traducido:
-
-```php
-<?php
-_e( 'Hello World! The current year is ' . date( 'Y' ), 'my-plugin' );
-```
-
-Para resolver este problema, podemos combinar nuestros textos a traducir con las funciones nativas de PHP `printf()` y `sprintf()`. El ejemplo anterior se puede replantear de manera correcta de esta forma:
-
-```php
-<?php
-printf( __( 'Hello World! The current year is %s', 'my-plugin' ), date( 'Y' ) );
-```
-
-Por último, se puede ofrecer una plantilla con textos localizables. La plantilla se trata de nada más que un archivo de texto con el nombre del dominio y con extensión POT (*Portable Object Template*), y un formato como el siguiente:
-
-```
-# my-plugin.pot
-msgid "Hello world!"
-msgstr ""
-
-msgid "some other value"
-msgstr ""
-```
-
-La propiedad `msgid` corresponde al texto original a traducir, y `msgstr` es la traducción propiamente dicha. En nuestro template este segundo valor va a estar en blanco, porque todavía no es una traducción, sino una herramienta para desarrollar nuevas traducciones.
-
-Muchas veces podemos contar con un número bastante grande de textos a traducir, por lo cual no es muy viable incluir todos manualmente en el archivo POT. Para esto tenemos programas que pueden generar el archivo POT de manera automática, como por ejemplo [Poedit](https://poedit.net/).
-
-Estos son simplemente los conceptos básicos de internacionalización y localización, y es todo lo que hace falta saber al momento de crear plugins que puedan ser traducidos.
