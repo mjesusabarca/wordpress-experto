@@ -758,6 +758,121 @@ add_action( 'admin_notices', 'hello_dolly' );
 
 No importa ahora mismo cómo funciona esta interacción entre funciones por medio de acciones, porque la vamos a ver con más detalle en los próximos capítulos. Lo que es importante saber ahora es que, una vez que creamos nuestro archivo principal de plugin y activamos el plugin desde el panel de administración, dentro de ese archivo podemos hacer cualquier cosa que PHP nos permita hacer.
 
+# Shortcodes
+
+Los shortcodes de WordPress son pequeños códigos que puedes añadir en el editor de WordPress. Se usan para añadir funciones al contenido de tus entradas y páginas sin tener que escribir un script cada vez que necesites hacer esa tarea.
+
+Son como tags HTML que usan corchetes ([ ]) en vez de los símbolos de “mayor y menor qué” (< >). Vamos, algo así:
+
+```
+[shortcode]
+```
+
+Lo primero es elegir el archivo PHP que “acogerá” las funciones de los shortcodes. La elección más habitual es el fichero functions.php del tema activo, que casi todos incluyen, y sino lo creas manualmente. También puedes crear tu propio plugin de funciones, una opción habitualmente más limpia y controlable.
+
+Los dos pasos básicos son estos:
+
+Crea la función primaria PHP
+
+Crea el conector add_shortcode, cuya función es conectar la función primaria PHP a WordPress (creas el shortcode para la función PHP y luego lo insertas en el editor de WordPress para que active esa función)
+Como he apuntado, una vez insertes el [shortcode] en tu editor, WordPress se conectará con el archivo functions.php o plugin de funciones y reemplazará de manera automática el shortcode con la función que creaste.
+
+Una vez hayas creado las funciones, sean pocas o muchas, todo lo que tienes que hacer es insertar el shortcode único asociado a cada función cada vez que lo quieras usar en tu editor.
+
+1.  Abrir el archivo de funciones (functions.php) de tu tema, normalmente en /wp-content/themes/tutema/functions.php, o el plugin de funciones y crear la función.
+
+Un ejemplo sencillo sería algo así:
+
+```
+function shortcode_gracias() {
+	return '<p>¡Gracias por todo!</p>';
+}
+add_shortcode('gracias', 'shortcode_gracias');
+```
+
+Guarda los cambios del archivo de funciones, ya estás listo para usar tu nuevo shortcode.
+
+2. Pon el nuevo shortcode [gracias] en el lugar que desees de tu editor de WordPress.
+
+Una vez guardes los cambios en tu página se vería el resultado de la función “llamada” por el shortcode, viéndose algo así:
+
+```
+¡Gracias por todo!
+```
+
+Ahora veremos unos ejemplos de uso de Shorcodes:
+
+**Shorcodes en widgets de texto**
+
+Lo primero es añadir este código al fichero functions.php de tu tema activo:
+
+```
+add_filter( 'widget_text', 'shortcode_unautop');
+add_filter( 'widget_text', 'do_shortcode');
+```
+
+La segunda línea es la que hace que funcionen los shortcodes en el widget de texto. Además, hay que tener en cuenta que los widgets de texto tienen una casilla para “añadir saltos de párrafo automáticamente”, pues bien, la segunda linea inhabilita el código autop que podría, en caso de estar marcada la casilla, meter el shortcode introducido en un párrafo o incluso romper las tags.
+
+**Shortcodes en el tema**
+
+También se pueden usar shortcodes en el tema que uses. Para ello utilizamos la función do_shortcode() en la que el argumento será una cadena que contendrá el shortcode.
+
+Por ejemplo, para mostrar el shortcode [publicidad] en tu tema pondrías algo así donde quieras que aparezca el resultado esperado:
+
+```
+<?php do_shortcode('[publicidad]'); ?>
+```
+
+La función do_shortcode() acepta cualquier tipo de texto. Si la cadena contiene un shortcode procesará ese código. De este modo, por ejemplo, podrías mostrar manualmente contenido de tus entradas de este modo:
+
+```
+<?php
+$content = get_the_content();
+echo do_shortcode($content);
+?>
+```
+
+**Shortcodes en comentarios**
+
+De nuevo recurrimos al fichero functions.php para añadirle este código que permite shortcodes en los campos de comentarios:
+
+```
+add_filter( 'comment_text', 'shortcode_unautop');
+add_filter( 'comment_text', 'do_shortcode' );
+```
+
+**Shortcodes en extractos**
+
+Ahora, en functions.php añadiremos esto para poder insertar shortcodes en los extractos de entrada:
+
+```
+add_filter( 'the_excerpt', 'shortcode_unautop');
+add_filter( 'the_excerpt', 'do_shortcode');
+```
+
+**Shortcodes en la descripción de usuario**
+
+Para poder meter shortcodes en la descripción del usuario hay que pasar la cadena de descripción por la función do_shortcode(). Para ello tendrás que añadir esto a tu tema activo:
+
+```
+<?php
+// $user_id = 3;
+$userdata = get_userdata($user_id);
+echo do_shortcode($userdata->description);
+?>
+```
+
+Solo tendrás que cambiar el ID de usuario, en este caso el 3.
+
+**Shortcodes en descripciones de etiquetas, categorías y taxonomías**
+
+También puedes filtrar estas descripciones. Para ello recurrimos de nuevo al fichero functions.php:
+
+```
+add_filter( 'term_description', 'shortcode_unautop');
+add_filter( 'term_description', 'do_shortcode' );
+```
+
 # Tipos de Contenido
 ## Post Types predefinidos
 
