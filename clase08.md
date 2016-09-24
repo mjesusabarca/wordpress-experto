@@ -1,3 +1,11 @@
+[Proyecto final - consigna]
+
+---
+
+[Conceptos de asincronismo]
+
+---
+
 # Tareas Asincrónicas
 
 ## Ejecución de procesos por medio de AJAX
