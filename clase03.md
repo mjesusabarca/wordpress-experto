@@ -583,3 +583,98 @@ function portfolio_create_project_post_type() {
 Para crear un nuevo post type, vamos a usar la función `register_post_type()` al momento de ejecutarse el evento `init`. La función va a recibir dos parámetros: el primero es el nombre interno del post type, y el segundo es un array conteniendo su descripción. Dentro de este array podemos usar una serie de valores bastante completa, a partir de los cuales nuestro post type va a contar o no con ciertas características. Todos estos valores se describen con detalle en la [documentación oficial de la función](https://codex.wordpress.org/Function_Reference/register_post_type), y en este momento solamente vamos a usar aquellos que nos van a permitir que nuestros proyectos se vean de la manera más similar posible a un post. Vamos a definir el nombre del post type en plural y en singular, vamos a indicar cuáles de los campos predefinidos por WordPress necesitamos, y a indicar que las entradas que generemos puedan verse desde la parte pública de nuestro sitio, y también a través de una página de archivo.
 
 De esta manera, cuando guardemos nuestro código, vamos a ver una nueva sección en el menú de administración: ***Projects***. Podemos cargar un nuevo proyecto, con su correspondiente título, contenido, extracto, autor e imagen destacada, y una vez que lo guardemos WordPress nos va a dar un link para visualizarlo en el front-end. Si todo anduvo bien, deberíamos ver algo muy parecido a un post, quizás con algunas diferencias menores, dependiendo del theme que estemos usando.
+
+# Taxonomías
+
+Los posts cuentan con dos tipos de taxonomías para organizar contenidos: las categorías y las etiquetas (o tags). La diferencia fundamental entre estos dos tipos de taxonomías es que las categorías pueden organizarse jerárquicamente, es decir que puede haber categorías principales, y además otras secundarias que las tengan como padres, mientras que las etiquetas están siempre al mismo nivel.
+
+El problema con el que nos encontramos al trabajar con *custom post types* es que no tenemos disponibles por defecto esas dos taxonomías para ordenar nuestros nuevos contenidos. Para hacerlo necesitamos crear taxonomías propias. Y con ese fin es que WordPress ofrece la función `register_taxonomy()`.
+
+Usarla es muy sencillo: como primer parámetro necesitamos el nombre que va a tener nuestra nueva taxonomía (podemos usar *"Category"*, *"Tag"*, o cualquier otro que se nos ocurra); en el segundo parámetro debemos especificar el nombre del post type al que la vamos a aplicar (o un array de post types, si vamos a aplicarla a más de uno); y nuestro tercer parámetro (opcional) es una lista de argumentos con las características de la taxonomía. Entre ellos, si va a ser jerárquica o no, y una lista de textos que WordPress va a mostrar en diferentes partes del sitio web cuando se use la taxonomía. El detalle de todo lo que se puede usar dentro de estos parámetros se puede ver en la [documentación oficial](https://codex.wordpress.org/Function_Reference/register_taxonomy).
+
+Vamos a agregar, entonces, dos taxonomías: una que se comporte de la misma manera que las categorías de posts, y otra que se comporte como las etiquetas.
+
+```php
+<?php
+add_action( 'init', 'portfolio_register_category_taxonomy' );
+
+function portfolio_register_category_taxonomy() {
+	register_taxonomy( 'project_category', 'project' , array(
+			'labels' => array(
+				'name'          => __( 'Categories', 'portfolio' ),
+				'singular_name' => __( 'Category', 'portfolio' ),
+			),
+            'hierarchical' => true,
+		) 
+	);
+}
+
+add_action( 'init', 'portfolio_register_tag_taxonomy' );
+
+function portfolio_register_tag_taxonomy() {
+    register_taxonomy( 'project_tag', 'project' , array(
+            'labels' => array(
+                'name'          => __( 'Tags', 'portfolio' ),
+                'singular_name' => __( 'Tag', 'portfolio' ),
+            ),
+            'hierarchical' => false,
+        ) 
+    );
+}
+
+```
+
+Al guardar el código y recargar la sección de administración, vamos a ver que bajo la sección *Projects* aparecen dos nuevos links: *Categories* y *Tags*. Accediendo a cada uno de ellos vamos a poder crear nuestras propias categorías y etiquetas, y asignárselas a nuestros proyectos. Estos nuevos datos que ingresamos como categorías y etiquetas son manejados por WordPress internamente como términos, o *terms*, y podemos ver la lista completa de funciones relacionadas con términos en la [documentación de la función `get_term()`](https://codex.wordpress.org/Function_Reference/get_term).
+
+Con esto ya podemos asignar categorías y etiquetas a nuestros proyectos, pero todavía no podemos verlas en el front-end del sitio. Para resolver esto, una posible solución es filtrar la información del evento `the_content`.
+
+```php
+<?php
+add_filter( 'the_content', 'portfolio_project_categories', 20 );
+
+function portfolio_project_categories( $content ) {
+	if ( taxonomy_exists( 'project_category' ) ) {
+		$taxonomy = get_taxonomy( 'project_category' );
+		$terms    = get_the_terms( get_the_ID(), 'project_category' );
+
+		if ( is_array( $terms ) ) {
+			$category_links = array();
+ 
+			 foreach ( $terms as $term ) {
+				 $category_links[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . $term->name . '</a>';
+			 }
+
+			$categories = join( ', ', $category_links );
+
+			$content .= '<div class="portfolio-project-taxonomy"><strong>' . $taxonomy['labels']['name'] . '</strong> ' . $categories . '</div>';
+		}
+	}
+
+	return $content;
+}
+
+add_filter( 'the_content', 'portfolio_project_categories', 30 );
+
+function portfolio_project_tags( $content ) {
+	if ( taxonomy_exists( 'project_tag' ) ) {
+		$taxonomy = get_taxonomy( 'project_tag' );
+		$terms    = get_the_terms( get_the_ID(), 'project_tag' );
+
+		if ( is_array( $terms ) ) {
+			$tag_links = array();
+ 
+			 foreach ( $terms as $term ) {
+				 $tag_links[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . $term->name . '</a>';
+			 }
+
+			$tags = join( ', ', $tag_links );
+
+			$content .= '<div class="portfolio-project-taxonomy"><strong>' . $taxonomy['labels']['name'] . '</strong> ' . $tags . '</div>';
+		}
+	}
+
+	return $content;
+}
+```
+
+Lo que hacemos en ambas funciones es chequear si la taxonomía ya existe. En caso afirmativo, obtenemos sus datos y la lista de términos que hayan sido creados bajo dicha taxonomía. A continuación construimos el código HTML que se va a agregar al contenido del proyecto, incluyendo el nombre de la taxonomía (*Category* y *Tag*) y una lista con los nombres de todos los términos creados para la misma, cada uno enlazando a su respectivas página de archivo. Una vez armada la pieza de código HTML, la agregamos al final del contenido original del post.
