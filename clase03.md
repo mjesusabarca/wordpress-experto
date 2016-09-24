@@ -1,5 +1,164 @@
 [Paradigma funcional]
 
+# Optimización de Funciones
+
+## Pluggable functions
+
+Estas permiten sustituir determinadas funciones básicas a través de plugins. 
+WordPress carga las funciones incorporadas sólo si están indefinidas después de que todos los plugins se hayan cargado.
+
+
+Las funciones condicionales ya no son  añadidas al núcleo de WordPress. 
+Todas estas nuevas funciones no utilizan filtros en su producción, para lograr una funcionalidad similar.
+
+**Nota**: una función sólo puede ser reasignado de  esta manera una vez , por lo que no se puede instalar dos plugins que se conectan a la misma función por diferentes razones.
+
+### Lista de Funciones condicionales
+
+* **wp-includes/pluggable.php**   
+    * auth_redirect
+    * cache_users
+    * check_admin_referer
+    * check_ajax_referer
+    * get_avatar
+    * get_currentuserinfo
+    * get_user_by_email (obsoleto)
+    * get_user_by
+    * get_userdatabylogin (obsoleto)
+    * get_userdata
+    * is_user_logged_in
+    * wp_authenticate
+    * wp_check_password
+    * wp_clear_auth_cookie
+    * wp_create_nonce
+    * wp_generate_auth_cookie
+    * wp_generate_password
+    * wp_get_current_user
+    * wp_hash_password
+    * wp_hash
+    * wp_logout
+    * wp_mail
+    * wp_new_user_notification
+    * wp_nonce_tick
+    * wp_notify_moderator
+    * wp_notify_postauthor
+    * wp_parse_auth_cookie
+    * wp_password_change_notification
+    * wp_rand
+    * wp_redirect
+    * wp_safe_redirect
+    * wp_salt
+    * wp_sanitize_redirect
+    * wp_set_auth_cookie
+    * wp_set_current_user
+    * wp_set_password
+    * wp_text_diff
+    * wp_validate_auth_cookie
+    * wp_validate_redirect
+    * wp_verify_nonce
+
+
+###  Referencia
+
+**get_currentuserinfo()**
+
+Toma la información si es que existe del usuario que ha iniciado sesión. 
+
+**get_userdata($userid) **
+
+Retorna la información de un  usuario especificado de la base de datos.
+
+
+**wp_login($username, $password, $already_md5 = false) **
+
+
+Retorna verdadero si el nombre de usuario y contraseña corresponden con los registradps por el usuario.
+
+**auth_redirect() **
+
+Si un usuario no está conectado, será redirigido a la página de inicio de sesión de WordPress antes de que se les permita acceder al contenido de la página desde la que se llama a esta función . Al iniciar la sesión con éxito , el usuario es enviado de vuelta a la página en cuestión.
+
+**wp_redirect($location)**
+
+Redirige el navegador a la URI absoluta  especificado por el parámetro $location.
+
+**wp_notify_postauthor($comment_id, $comment_type='')**
+
+Envia un mensajes de correo electrónico al autor cuado le hacen un comentario a uno de sus contenidos.
+
+**wp_notify_moderator($comment_id) **
+
+Informa a la cuenta de correo electrónico administrativo que los comentario especificado deben ser moderados.
+
+
+### Ejemplo 
+
+
+Un ejemplo de lo que puede hacer con una pluggable functions activo es reemplazar el controlador de correo electrónico predeterminado. Para ello, lo que se necesita para escribir un plugin que define una función wp_mail(). Por defecto la función wp_mail() se ve como esto:
+
+```
+function wp_mail( $to, $subject, $message, $headers = '' ) {
+  if( $headers == '' ) {
+    $headers = "MIME-Version: 1.0\n" .
+      "From: " . get_settings('admin_email') . "\n" . 
+      "Content-Type: text/plain; charset=\"" . get_settings('blog_charset') . "\"\n";
+  }
+
+  return @mail( $to, $subject, $message, $headers );
+}
+```
+
+Pero por ejemplo, si desea copiar todo su correo a otra dirección, se puede utilizar este código en un plugin:
+
+```
+if( ! function_exists('wp_mail') ) {
+  function wp_mail( $to, $subject, $message, $headers = '' ) {
+    if( $headers == '' ) {
+      $headers = "MIME-Version: 1.0\n" .
+        "From: " . get_settings('admin_email') . "\n" . 
+        "Cc: dummy@example.com\n" .
+        "Content-Type: text/plain; charset=\"" . get_settings('blog_charset') . "\"\n";
+    }
+
+    return @mail($to, $subject, $message, $headers);
+  }
+}
+```
+
+
+Observe que si se conecta una función básica como esta el original ya no está disponible.
+
+-----------------
+
+
+## Funciones extensibles (by-pass)
+
+El *by-passing* es una práctica que permite crear una vía alternativa para el proceso interno de una función. A diferencia de las funciones extensibles, no se reemplaza una función por otra, sino que se ingresa a la función original, se ejecuta un proceso diferente, y se detiene la ejecución del resto del código. En WordPress podemos lograrlo por medio del uso de filtros.
+
+```
+// Función original:
+function my_original_function() {
+  if ( apply_filters( 'my_original_function_hook', false ) ) {
+    return; // Se detiene la ejecución de la función en caso de que el filtro resuelva "true".
+  }
+  
+  echo 'Hola mundo!';
+}
+
+// Función de by-pass:
+function my_by_pass_function() {
+  echo 'Chau mundo!';
+  
+  return true; // Devolvemos "true". Esto es importante para que la ejecución de la función original se detenga.
+}
+
+// Seteamos el filtro de by pass:
+add_filter( 'my_original_function_hook', 'my_by_pass_function' );
+
+// Llamamos a la función original:
+my_original_function(); // Se imprime 'Chau mundo!'
+```
+
 ---
 
 # Programación Orientada a Eventos
@@ -521,6 +680,83 @@ function register_my_menu() {
   ) );
 }
 ```
+
+# Qué es un plugin y para qué sirve
+
+En un sentido conceptual, podríamos decir que todo sitio o aplicación web se divide en tres partes: **contenido**, **presentación** y **funcionalidad**. **El contenido es aquella información variable que nuestro sitio o aplicación le muestra al usuario final**, y que alguien con los permisos adecuados puede agregar, modificar o eliminar. En la mayoría de las aplicaciones modernas es provisto de manera externa por un usuario, sin necesidad de modificar de manera manual los archivos que constituyen a la aplicación, y normalmente queda guardado en algún tipo de base de datos. **La presentación es la forma en la que esa información se le muestra al usuario**, y tiene que ver con la implementación de algún tipo de diseño gráfico sobre una interfaz; es básicamente cómo se ve nuestro proyecto. **La funcionalidad tiene que ver con todos los procesos internos que manejan el contenido** (por ejemplo la carga, edición y eliminación) y lo dejan preparado para ser presentado al usuario.
+
+WordPress, como todo CMS (por *Content Management System*) o sistema de gestión de contenidos, se encarga por su cuenta de gran parte de las cuestiones técnicas relacionadas con la manipulación de información. Sin embargo, muchas veces vamos a encontrarnos con que necesitamos poder manejar algún tipo de información que no está disponible desde la instalación, o que se ejecuten ciertos procesos internos invisibles al usuario, o que necesitamos mostrar algo de una manera que no estaba prevista por las opciones de presentación que tenemos a nuestro alcance. Ese es el momento en el cual entran en acción los plugins y themes.
+
+**Lo que se dice más típicamente en el ámbito de los desarrolladores que trabajan con WordPress es que, mientras los themes están pensados para manejar cuestiones de presentación, los plugins apuntan exclusivamente a agregar nueva funcionalidad.** Sin embargo, en este libro vamos a ponernos un poco más específicos con estas definiciones, y a decir que eso no siempre es tan así. Eso pasa porque la funcionalidad y la presentación no siempre son dos conceptos inseparables, sino que a veces están muy entrelazados. Y si bien siempre es una excelente práctica intentar separarlos cuanto sea posible, a veces se presentan algunas situaciones problemáticas en las que es complicado distinguirlos. Por eso nos vamos a encontrar muy típicamente con themes que manejan algunas cuestiones de funcionalidad, o con plugins que ofrecen algún tipo de presentación. Incluso hay cosas que bien podrían ser incluidas tanto en plugins como en themes, y en ese punto nos vemos obligados a decidir dónde es mejor colocarlas.
+
+Teniendo en cuenta todo esto, podemos decir que **los themes, más que tener que ver específicamente con la presentación, en realidad tienen el foco puesto en ella, sin dejar completamente de lado la funcionalidad**. Son aquello que, a grandes rasgos, va a definir de qué manera se va a ver nuestro sitio, pero pueden ofrecer ciertas características de comportamiento. **Lo mismo se aplica a los plugins, pero a la inversa: tienen el foco puesto en agregar nueva funcionalidad a nuestro sitio, pero pueden ofrecer nuevas formas de visualización**.
+
+A partir de tener presentes cuáles son estas diferencias y similitudes conceptuales básicas entre plugins y themes, podemos empezar a construir nuestros propios plugins.
+
+# Cómo crear un plugin básico
+
+![](https://www.dropbox.com/s/v4x0ws69lhsoy21/Screenshot%202016-07-19%2015.33.36.png?dl=0&raw=1)
+En un sentido reduccionista, los plugins son simples archivos PHP que se encuentran en la carpeta `wp-content/plugins` de nuestra instalación de WordPress. El paquete de instalación de WordPress incluye dos plugins: **Akismet** y **Hello Dolly**. Hello Dolly es un plugin que consiste en un simple archivo llamado `hello.php`, y lo podemos encontrar suelto en la carpeta de plugins. Akismet es más complejo: consiste en varios archivos, y por una cuestión de orden lo vamos a encontrar en su propia carpeta. Sin embargo, dentro de esa carpeta vamos a encontrar un archivo principal llamado `akismet.php`. La similitud entre estos dos archivos, `hello.php` y `akismet.php`, es que ambos cuentan con una sección de código comentado al inicio de cada uno, conteniendo una serie de definiciones con los datos de cada plugin. Esa porción de código, que funciona a manera de encabezado del plugin, es lo que permite que WordPress reconozca el archivo como el principal de un plugin, y que a partir de ahí lo pueda mostrar en la lista de la sección *Plugins* de nuestra instalación.
+
+Esta forma de organización nos indica que un plugin puede estar suelto dentro de `wp-content/plugins` o dentro una carpeta propia del plugin. Lo importante es que el archivo cuente con ese encabezado en el que se declaren ciertos datos del plugin. Solamente es obligatorio que nuestro plugin tenga un nombre, pero también podemos agregar descripción, link, autor, versión, etc.
+
+```php
+<?php
+/*
+Plugin Name: Mi plugin
+Plugin URI:  http://example.org/mi-plugin
+Description: Esta es la descripción de mi plugin.
+Version:     1.0
+Author:      Andrés Villarreal
+Author URI:  http://andrezrv.com
+License:     GPL2
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Domain Path: /languages
+Text Domain: mi-plugin
+*/
+```
+
+Una vez que tenemos nuestro archivo principal con su encabezado, podemos ver que WordPress lo reconoce como tal en nuestra lista de plugins instalados. Sin embargo, todavía no está activo. Para activarlo tenemos que hacer click en el link correspondiente. Eso hace que todo el código PHP que escribamos en nuestro archivo empiece a ejecutarse, como pasa con cualquier archivo PHP que podamos ejecutar en un proyecto propio.
+
+![](https://www.dropbox.com/s/m9xg4x3xanolse9/Screenshot%202016-07-19%2015.51.28.png?dl=0&raw=1)
+
+Como todavía no tenemos nada de código PHP propiamente dicho, más allá del encabezado, no tenemos nada ejecutándose. Podemos solucionar eso rápidamente escribiendo algo de código PHP después del encabezado, como por ejemplo un `die( 'Hello world!' );`. Esto va a hacer que, una vez que actualicemos nuestro browser en cualquier página de nuestra instalación de WordPress, se imprima *"Hello world!"* y la ejecución del script termine, tal como dicta el comportamiento de la función `die()`. Claramente, esto no es para nada útil, pero sirve para darnos una idea de la libertad de manejo de código que tenemos  a partir de ese archivo.
+
+```php
+<?php
+/*
+Plugin Name: Mi plugin
+Plugin URI:  http://example.org/mi-plugin
+Description: Esta es la descripción de mi plugin.
+Version:     1.0
+Author:      Andrés Villarreal
+Author URI:  http://andrezrv.com
+License:     GPL2
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Domain Path: /languages
+Text Domain: mi-plugin
+*/
+
+die( 'Hello world!' );
+```
+
+Para ver más posibilidades acerca de lo que nos permite WordPress, una buena idea a la hora de empezar es estudiar Hello Dolly. Dentro de `hello.php` podemos ver que se declara una función, `hello_dolly()`, que toma una línea de la canción "Hello Dolly" al azar, y la imprime al ejecutarse la acción `admin_notices`, por medio del uso de la función `add_action()`. De hecho, si activamos Hello Dolly desde nuestra lista de plugins, podemos ver que la línea que se muestra cambia cada vez que actualizamos cualquier página en la sección de administración, reflejando lo que se define en el código del plugin.
+
+**Extracto de `hello.php`:**
+
+```php
+<?php
+// This just echoes the chosen line, we'll position it later
+function hello_dolly() {
+    $chosen = hello_dolly_get_lyric();
+    echo "<p id='dolly'>$chosen</p>";
+}
+
+// Now we set that function up to execute when the admin_notices action is called
+add_action( 'admin_notices', 'hello_dolly' );
+```
+
+No importa ahora mismo cómo funciona esta interacción entre funciones por medio de acciones, porque la vamos a ver con más detalle en los próximos capítulos. Lo que es importante saber ahora es que, una vez que creamos nuestro archivo principal de plugin y activamos el plugin desde el panel de administración, dentro de ese archivo podemos hacer cualquier cosa que PHP nos permita hacer.
 
 # Tipos de Contenido
 ## Post Types predefinidos
