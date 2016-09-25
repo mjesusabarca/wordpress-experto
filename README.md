@@ -46,6 +46,7 @@ El curso está dirigido a alumnos que cuenten con conocimientos de WordPress des
   * Intro a themes
     * Declaración
     * Jerarquía de templates
+    * Page templates
     * Child themes
     * Carga de estilos y scripts
   * Trabajo Práctico :white_check_mark:
