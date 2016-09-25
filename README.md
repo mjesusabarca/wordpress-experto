@@ -139,9 +139,9 @@ El curso está dirigido a alumnos que cuenten con conocimientos de WordPress des
     * Uso de jQuery (paradigma de eventos)
     * Impacto de JavaScript en front-end
 
-### [Clase 8: Proyecto final y asincronismo](clase08.md) :checkered_flag:
+### [Clase 8: Workshop y asincronismo](clase08.md) :checkered_flag:
 
-  * Proyecto final
+  * Workshop
     * Finalización de theme o plugin propio según los temas tratados en clase
   * Asincronismo
     * Presentación de AJAX

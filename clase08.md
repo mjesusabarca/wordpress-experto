@@ -1,9 +1,12 @@
 # Clase 8
 
 [comment]: # (Faltantes:)
-[comment]: # ([Proyecto final - consigna])
 [comment]: # ([Conceptos de asincronismo])
 [comment]: # ([AJAX con jQuery])
+
+## Workshop
+
+Continuar con el desarrollo en clase del plugin o theme propio, implementando los conocimientos adquiridos hasta la clase 8, y siguiendo los lineamientos de calidad de código detallados de el [Plugin Developer Handbook](https://developer.wordpress.org/plugins/). El objetivo final es subir el plugin o theme al directorio oficial de WordPress.
 
 ## Tareas Asincrónicas
 
