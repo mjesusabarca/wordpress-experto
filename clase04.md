@@ -1,12 +1,9 @@
-[Manejo de datos en PHP]
+# Clase 4
 
----
+[comment]: # (Manejo de datos en PHP)
+[comment]: # (Intro a MySQL)
 
-[Intro a MySQL]
-
----
-
-#  Manipulación de Base de Datos en WordPress
+##  Manipulación de Base de Datos en WordPress
 
 WordPress define una clase llamada `wpdb`, la cual contiene un conjunto de métodos que se utilizan para interactuar con una base de datos. Su objetivo principal es facilitar la interacción con la base de datos de WordPress, pero se puede utilizar para comunicarse con cualquier otra base de datos.
 
@@ -18,7 +15,7 @@ El método `wpdb::get_var()` devuelve un valor único por medio de una consulta 
 
 **Ejemplo:**
 
-```
+```php
 <?php
 $user_count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->users" );
 echo '<p>User count is ' . $user_count . '</p>';
@@ -30,30 +27,32 @@ Para recuperar una fila completa de una consulta se utiliza `wpdb::get_row()`. E
 
 **Ejemplo:**
 
-```
+```php
+<?php
 $row = $wpdb->get_row( "SELECT * FROM $wpdb->links WHERE link_id = 10", OBJECT ); // Devuelve un objeto.
 $row = $wpdb->get_row( "SELECT * FROM $wpdb->links WHERE link_id = 10", ARRAY_A ); // Devuelve un array asociativo.
 $row = $wpdb->get_row( "SELECT * FROM $wpdb->links WHERE link_id = 10", ARRAY_N ); // Devuelve un array de índice numérico.
+?>
 ```
 
 Los valores de la variable `$row` son los nombres de las columnas del resultado de la consulta SQL (en este ejemplo, todas las columnas de la tabla `wp_links`, pero también se podría consultar por columnas específicas).
 
 De esta manera, si variable es un objeto, podríamos obtener el valor de la columna `link_id` de esta manera:
 
-```
-echo $row->link_id; // Imprime "10"
+```php
+<?php echo $row->link_id; // Imprime "10" ?>
 ```
 
 En caso de que la variable sea un array asociativo `link_id` se obtendría así:
 
-```
-echo $row['link_id']; // Imprime "10"
+```php
+<?php echo $row['link_id']; // Imprime "10" ?>
 ```
 
 Y para un array de índice numérico:
 
-```
-echo $row[1]; // Imprime "10"
+```php
+<?php echo $row[1]; // Imprime "10" ?>
 ```
 
 ### Selección de una columna
@@ -63,6 +62,7 @@ Para seleccionar una columna, contamos con el método `wpdb::get_col()`. Este m�
 ```
 <?php
 $col = $wpdb->get_col( "SELECT ID FROM $wpdb->posts LIMIT 0, 10" );
+?>
 ```
 
 ### Inserción de una fila
@@ -71,18 +71,20 @@ Para insertar una nueva fila en una tabla se usa el método `wpdb::insert()`.
 
 Suponiendo una tabla con el nombre `table` y con dos columnas llamadas `column1` y `column2`, podemos asignar nuevos datos para esas columnas de la siguiente manera:
 
-```
-$wpdb->insert( 
-	'table', 
-	array( 
-		'column1' => 'value1', 
-		'column2' => 123 
-	), 
-	array( 
-		'%s', 
-		'%d' 
-	) 
+```php
+<?php
+$wpdb->insert(
+	'table',
+	array(
+		'column1' => 'value1',
+		'column2' => 123
+	),
+	array(
+		'%s',
+		'%d'
+	)
 );
+?>
 ```
 
 ### Eliminación de una fila
@@ -91,6 +93,6 @@ El método `wpdb::delete()` se puede utilizar para borrar registros de una tabla
 
 **Ejemplo:**
 
-```
-$wpdb->delete ( 'table', array ( 'ID' => 1 ), array ( '%d') );
+```php
+<?php $wpdb->delete ( 'table', array ( 'ID' => 1 ), array ( '%d') ); ?>
 ```

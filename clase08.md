@@ -1,22 +1,21 @@
-[Proyecto final - consigna]
+# Clase 8
 
----
+[comment]: # (Faltantes:)
+[comment]: # ([Proyecto final - consigna])
+[comment]: # ([Conceptos de asincronismo])
+[comment]: # ([AJAX con jQuery])
 
-[Conceptos de asincronismo]
+## Tareas Asincrónicas
 
----
-
-# Tareas Asincrónicas
-
-## Ejecución de procesos por medio de AJAX
+### Ejecución de procesos por medio de AJAX
 
 AJAX es una tecnología asincrónica, en el sentido de que ciertos datos se solicitan al servidor y se cargan en segundo plano sin interferir con la visualización ni el comportamiento de la página, hasta el momento en que deban mostrarse.
 
-### AJAX en WordPress
+#### AJAX en WordPress
 
 En WordPress, una gran cantidad de trabajo puede hacerse más sencillo utilizando AJAX. El corazón de este es el archivo **wp-admin/admin-ajax.php**. La finalidad de este fichero es el manejo de las peticiones AJAX.
 
-#### admin-ajax.php
+##### admin-ajax.php
 
 Cuando el archivo `admin-ajax.php` recibe una solicitud, este se encarga de encender el motor de WordPress e inicializar todo lo necesario. Luego, inspecciona la solicitud para realizar la acción. Esto no es nada más que un valor de cadena arbitraria. Si ninguna acción es enviada en la solicitud, "morirá" con 0 , lo que indica un fallo. Para fines de ejemplo, vamos a suponer que la acción enviada en una solicitud es **get_comments**.
 
@@ -24,7 +23,7 @@ Una vez que WordPress se ha inicializado, se dispara una de las dos acciones dep
 
 Esta es una buena manera de dividir los comportamientos. Si una acción mediante AJAX sólo debe realizarse en la sección de administración, no utilice el **hook _nopriv_**. Esto ayudará a mantener todo un poco más seguro.
 
-### Objeto XMLHttpRequest
+#### Objeto XMLHttpRequest
 
 Lo primero que debemos hacer para que podamos realizar peticiones al servidor con AJAX es definirnos el objeto del siguiente modo:
 
@@ -50,7 +49,7 @@ Lo primero que debemos hacer para que podamos realizar peticiones al servidor co
 
 Existen diversas codificaciones del objeto. Aquí hemos puesto una de ellas como ejemplo.
 
-### AJAX asíncrono
+#### AJAX asíncrono
 
 La codificación resumida de una llamada asíncrona suele ser del siguiente modo:
 
@@ -65,7 +64,7 @@ La codificación resumida de una llamada asíncrona suele ser del siguiente modo
  oXML.onreadystatechange = leerDatos;
  // Realizamos la petición
  oXML.send(‘parametro=’ + escape(parametro));
- 
+
  function leerDatos() {
   if (oXML.readyState == 4) {
    alert (oXML.responseText);
@@ -73,5 +72,3 @@ La codificación resumida de una llamada asíncrona suele ser del siguiente modo
  }
 </script>
 ```
-
-[AJAX con jQuery]

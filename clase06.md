@@ -1,12 +1,10 @@
-[Intro OOP]
+# Clase 6
 
----
+[comment]: # (Faltantes:)
+[comment]: # ([Intro OOP])
+[comment]: # ([The Loop])
 
-[The Loop]
-
---
-
-# Widgets
+## Widgets
 
 Para crear un widget, solo se necesita extender la clase estándar **WP_Widget** y algunos de sus métodos.
 
@@ -47,7 +45,7 @@ Este ejemplo crea un widget llamado **FooWidget** que tiene un formulario de con
 class FooWidget extends WP_Widget {
     /** constructor */
     function FooWidget() {
-        parent::WP_Widget(false, $name = 'FooWidget');	
+        parent::WP_Widget(false, $name = 'FooWidget');
     }
 
     /** @see WP_Widget::widget */
@@ -75,7 +73,7 @@ class FooWidget extends WP_Widget {
         $title = esc_attr($instance['title']);
         ?>
             <p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></label></p>
-        <?php 
+        <?php
     }
 
 } // clase FooWidget

@@ -1,171 +1,408 @@
-[Paradigma funcional]
+# Clase 3
 
-# Optimización de Funciones
+[comment]: # (Material completo)
 
-## Pluggable functions
+## Carga de archivos
 
-Estas permiten sustituir determinadas funciones básicas a través de plugins. 
-WordPress carga las funciones incorporadas sólo si están indefinidas después de que todos los plugins se hayan cargado.
+PHP nos permite separar nuestro código en diferentes archivos para poder mantenerlo de forma más ordenada. Para esto contamos con las construcciones `require`, `require_once`, `include` e `include_once`.
 
+Por ejemplo, si estamos trabajando en un archivo llamado `contacto.php`, y queremos reutilizar el código contenido en `encabezado.php`, debemos usar una de las cuatro construcciones para incluir el archivo:
 
-Las funciones condicionales ya no son  añadidas al núcleo de WordPress. 
-Todas estas nuevas funciones no utilizan filtros en su producción, para lograr una funcionalidad similar.
-
-**Nota**: una función sólo puede ser reasignado de  esta manera una vez , por lo que no se puede instalar dos plugins que se conectan a la misma función por diferentes razones.
-
-### Lista de Funciones condicionales
-
-* **wp-includes/pluggable.php**   
-    * auth_redirect
-    * cache_users
-    * check_admin_referer
-    * check_ajax_referer
-    * get_avatar
-    * get_currentuserinfo
-    * get_user_by_email (obsoleto)
-    * get_user_by
-    * get_userdatabylogin (obsoleto)
-    * get_userdata
-    * is_user_logged_in
-    * wp_authenticate
-    * wp_check_password
-    * wp_clear_auth_cookie
-    * wp_create_nonce
-    * wp_generate_auth_cookie
-    * wp_generate_password
-    * wp_get_current_user
-    * wp_hash_password
-    * wp_hash
-    * wp_logout
-    * wp_mail
-    * wp_new_user_notification
-    * wp_nonce_tick
-    * wp_notify_moderator
-    * wp_notify_postauthor
-    * wp_parse_auth_cookie
-    * wp_password_change_notification
-    * wp_rand
-    * wp_redirect
-    * wp_safe_redirect
-    * wp_salt
-    * wp_sanitize_redirect
-    * wp_set_auth_cookie
-    * wp_set_current_user
-    * wp_set_password
-    * wp_text_diff
-    * wp_validate_auth_cookie
-    * wp_validate_redirect
-    * wp_verify_nonce
-
-
-###  Referencia
-
-**get_currentuserinfo()**
-
-Toma la información si es que existe del usuario que ha iniciado sesión. 
-
-**get_userdata($userid) **
-
-Retorna la información de un  usuario especificado de la base de datos.
-
-
-**wp_login($username, $password, $already_md5 = false) **
-
-
-Retorna verdadero si el nombre de usuario y contraseña corresponden con los registradps por el usuario.
-
-**auth_redirect() **
-
-Si un usuario no está conectado, será redirigido a la página de inicio de sesión de WordPress antes de que se les permita acceder al contenido de la página desde la que se llama a esta función . Al iniciar la sesión con éxito , el usuario es enviado de vuelta a la página en cuestión.
-
-**wp_redirect($location)**
-
-Redirige el navegador a la URI absoluta  especificado por el parámetro $location.
-
-**wp_notify_postauthor($comment_id, $comment_type='')**
-
-Envia un mensajes de correo electrónico al autor cuado le hacen un comentario a uno de sus contenidos.
-
-**wp_notify_moderator($comment_id) **
-
-Informa a la cuenta de correo electrónico administrativo que los comentario especificado deben ser moderados.
-
-
-### Ejemplo 
-
-
-Un ejemplo de lo que puede hacer con una pluggable functions activo es reemplazar el controlador de correo electrónico predeterminado. Para ello, lo que se necesita para escribir un plugin que define una función wp_mail(). Por defecto la función wp_mail() se ve como esto:
-
+```php
+# contacto.php
+<?php
+require 'encabezado.php';
+require_once 'encabezado.php';
+include 'encabezado.php';
+include_once 'encabezado.php';
+?>
 ```
-function wp_mail( $to, $subject, $message, $headers = '' ) {
-  if( $headers == '' ) {
-    $headers = "MIME-Version: 1.0\n" .
-      "From: " . get_settings('admin_email') . "\n" . 
-      "Content-Type: text/plain; charset=\"" . get_settings('blog_charset') . "\"\n";
+
+Una diferencia entre estas construcciones es que aquellas con el sufijo `_once` solamente incluyen el archivo si no fue incluido previamente en alguna parte de la aplicación, lo cual evita la replicación de código. Sin embargo, a veces es deseable que el código se replique, y en estos casos se debe preferir usar `include` o `require`.
+
+Otra diferencia es que `require` y `require_once` hacen una inclusión estricta, es decir que PHP va a arrojar un error fatal y cortar la ejecución de la aplicación en caso de que el archivo no se encuentre. En el caso de `include` e `include_once` no hay error fatal ni se detiene la ejecución, pero sí se imprime una advertencia.
+
+## Paradigma estructurado
+
+El paradigma de programación estructurada trabaja sobre la idea de que todo programa o aplicación puede escribirse usando tres tipos de instrucciones:
+
+* Secuencias (bloques de declaraciones y ejecuciones)
+* Condiciones (`if`, `switch`)
+* Bucles (`while`, `for`, `foreach`)
+
+En PHP, un ejemplo simple de programación estructurada sería el siguiente:
+
+```php
+<?php
+// Secuencia (declaración)
+$lista = array( 'Pan', 'Leche', 'Azúcar' );
+
+// Condición
+if ( is_array( $lista ) && ! empty( $lista ) ) {
+  // Bucle
+  foreach ( $lista as $item ) {
+    // Secuencia (ejecución)
+    echo $item; // Imprime cada elemento de la lista.
   }
-
-  return @mail( $to, $subject, $message, $headers );
 }
+?>
 ```
 
-Pero por ejemplo, si desea copiar todo su correo a otra dirección, se puede utilizar este código en un plugin:
+Este paradigma es el que se usa principalmente en PHP y, aunque puede ser combinado con otros, tales como el funcional, el orientado a objetos y el orientado a eventos, estos se usan en combinación con el estructurado.
 
-```
-if( ! function_exists('wp_mail') ) {
-  function wp_mail( $to, $subject, $message, $headers = '' ) {
-    if( $headers == '' ) {
-      $headers = "MIME-Version: 1.0\n" .
-        "From: " . get_settings('admin_email') . "\n" . 
-        "Cc: dummy@example.com\n" .
-        "Content-Type: text/plain; charset=\"" . get_settings('blog_charset') . "\"\n";
+Una característica del paradigma estructurado es que su tiempo de ejecución es secuencial, inmediato y continuo. Esto significa que cada bloque de código se va a ejecutar en el mismo orden en el que fue ubicado por el programador. Este puede no ocurrir al trabajar con otros paradigmas.
+
+## Paradigma funcional
+
+El paradigma de programación funcional propone que todo programa o aplicación debe consistir únicamente en definiciones de funciones que se utilizan mutuamente para obtener valores o ejecutar procesos. En sus implementaciones más puras no existen las variables, y las funciones consisten en procedimientos similares a operaciones matemáticas. Prácticamente no es utilizado en su forma más estricta en desarrollo web, pero muchos lenguajes de programación que no son estrictamente funcionales, como JavaScript, Python y PHP, incorporan ciertos conceptos de la programación funcional para facilitar el trabajo del programador.
+
+Las funciones son bloques de código reutilizable, que se definen una única vez y pueden ejecutarse múltiples veces, produciendo siempre un resultado similar. Pueden recibir una serie de parámetros, cuyo valor puede modificar el resultado de una función.
+
+En PHP, las funciones se declaran usando la palabra `function` seguida del nombre que vamos a asignar a nuestra función. El nombre puede escribirse de la misma forma que las variables, pero sin el caracter `$`. A continuación del nombre se usan paréntesis, entre los cuales se colocan los nombres de los parámetros que puede recibir la función.
+
+```php
+<?php
+function imprimir_lista( $lista ) {
+  // Condición
+  if ( is_array( $lista ) && ! empty( $lista ) ) {
+    // Bucle
+    foreach ( $lista as $item ) {
+      // Secuencia (ejecución)
+      echo $item . "\n" ; // Imprime cada elemento de la lista.
     }
-
-    return @mail($to, $subject, $message, $headers);
   }
+}
+?>
+```
+
+Al programar utilizando funciones podemos seguir utilizando secuencias, condiciones y bucles. Podemos entender, entonces, que la programación funcional en PHP presupone el uso de la programación estructurada.
+
+Para ejecutar el código contenido en una función, simplemente escribimos su nombre y, entre paréntesis, los valores de los parámetros que queremos enviarle.
+
+```php
+<?php
+function imprimir_lista( $lista ) {
+  if ( is_array( $lista ) && ! empty( $lista ) ) {
+    foreach ( $lista as $item ) {
+      echo $item . "\n" ; // Imprime cada elemento de la lista.
+    }
+  }
+}
+
+// Se define una variable:
+$lista = array( 'Pan', 'Leche', 'Azúcar' );
+
+// Se ejecuta la función:
+imprimir_lista( $lista );
+
+// Se imprime:
+// Pan
+// Leche
+// Azúcar
+?>
+```
+
+Una función también puede recibir más de un parámetro:
+
+```php
+<?php
+function imprimir_lista( $lista, $titulo ) {
+  if ( is_array( $lista ) && ! empty( $lista ) ) {
+    echo $titulo . "\n";
+
+    foreach ( $lista as $item ) {
+      echo $item . "\n" ; // Imprime cada elemento de la lista.
+    }
+  }
+}
+
+// Se ejecuta la función:
+imprimir_lista( array( 'Pan', 'Leche', 'Azúcar' ), 'Lista de compras' );
+
+// Se imprime:
+// Lista de compras
+// Pan
+// Leche
+// Azúcar
+?>
+```
+
+Es importante notar que el llamado a la función debe hacerse una vez que la función ya haya sido declarada. De lo contrario, PHP imprime un error fatal con el mensaje "Call to undefined function".
+
+Una función también puede ser usada para obtener datos. El siguiente ejemplo devuelve una cadena de texto a partir del contenido de un array:
+
+```php
+<?php
+function lista_en_texto( $lista ) {
+  $texto = '';
+
+  if ( is_array( $lista ) && ! empty( $lista ) ) {
+    foreach ( $lista as $item ) {
+      $texto .= $item . "\n" ;
+    }
+  }
+
+  return $texto;
+}
+
+// Se ejecuta la función:
+$lista = lista_en_texto( array( 'Pan', 'Leche', 'Azúcar' ) );
+
+// Valor de $lista:
+// Pan
+// Leche
+// Azúcar
+?>
+```
+
+La construcción `return` arroja un resultado que puede ser asignado a una variable o constante. Es importante notar que, una vez ejecutada, cierra la ejecución de la función que la contiene.
+
+```php
+<?php
+function lista_en_texto( $lista ) {
+  $texto = '';
+
+  if ( is_array( $lista ) && ! empty( $lista ) ) {
+    foreach ( $lista as $item ) {
+      $texto .= $item . "\n" ;
+    }
+  }
+
+  return $texto;
+
+  echo $texto; // No se ejecuta, porque se usó "return" más arriba.
+}
+?>
+```
+
+### Redeclaración de funciones
+
+Al contrario de las variables, las funciones no pueden ser redefinidas. Es decir que, si intentáramos escribir una nueva función con el mismo nombre de una ya existente, PHP arrojaría un error fatal.
+
+```php
+<?php
+function mi_funcion() {
+  echo 'Hello World!';
+}
+
+function mi_funcion() {
+  echo 'Hola Mundo!';
+}
+
+// Error fatal.
+?>
+```
+
+Sin embargo, existe la posibilidad de que el nombre de una función pueda ser reutilizado, reemplazando a la función original. Para eso, la función original debe haber sido declarada dentro de un bloque condicional que chequea si ya existe.
+
+```php
+<?php
+// Si no existe una función con el nombre "mi_funcion", se la declara.
+if ( ! function_exists( 'mi_funcion' ) ) {
+  function mi_funcion() {
+    echo 'Hello World!';
+  }
+}
+?>
+```
+
+De esta manera, si antes del condicional se declara otra función con el mismo nombre, aquella que se encuentra dentro del condicional no va a ser declarada.
+
+```php
+<?php
+function mi_funcion() {
+  echo 'Hola Mundo!';
+}
+
+// Si no existe una función con el nombre "mi_funcion", se la declara.
+if ( ! function_exists( 'mi_funcion' ) ) {
+  function mi_funcion() {
+    echo 'Hello World!';
+  }
+}
+
+mi_funcion(); // Imprime "Hola Mundo!".
+?>
+```
+
+#### Pluggable functions
+
+Una característica que nos ofrece WordPress es la de reservar ciertos nombres de funciones para que podamos utilizarlos para reemplazar funcionalidad nativa por la nuestra. A estas funciones, en la terminología propia de WordPress, nos referimos como ***[Pluggable Functions](https://codex.wordpress.org/Pluggable_Functions)***.
+
+Estas funciones tienen la característica de ser definidas recién después de que todos los plugins se hayan cargado, y chequean si la función ya se declaró antes, usando `function_exists()`. Lo que hacen es algo como esto:
+
+```php
+<?php
+if ( ! function_exists( 'wp_mail' ) ) :
+function wp_mail( $args... ) {
+	// Code here…
+}
+endif;
+```
+
+Esto permite que podamos definir nuestras propias funciones con ese nombre antes de que WordPress lo haga.
+
+```php
+<?php
+// En nuestro plugin…
+
+function wp_mail( $args... ) {
+	// Code here…
+}
+
+// En WordPress…
+
+if ( ! function_exists( 'wp_mail' ) ) :
+function wp_mail( $args... ) {
+	// Code here…
+}
+endif;
+```
+
+Si hacemos esto, cada vez que se llame a la función `wp_mail()` se va a ejecutar nuestro código para esa función en lugar del código de WordPress.
+
+Esta posibilidad de redefinir funciones nativas es extremadamente útil para plugins que necesitan llevar a cabo sus propios procesos de envío de mails, validación de usuarios, generación de contraseñas, etc.
+
+En nuestros plugins también podemos crear nuestras propias *Pluggable Functions*, para permitir a otros desarrolladores que redefinan funcionalidad de nuestros plugins cuando lo necesiten.
+
+```php
+<?php
+// En un plugin de terceros...
+function my_function() {
+	_e( 'Hello John!', 'third-party-plugin' );
+}
+
+// En nuestro plugin...
+if ( ! function_exists( 'my_function' ) ) :
+function my_function() {
+	_e( 'Hello world!', 'my-plugin' );
+}
+endif;
+```
+
+Hay que tener en cuenta que, si alguien quiere redefinir nuestras funciones, tiene que encargarse de declarar las suyas antes de que se declaren las nuestras. Como no podemos estar seguros del orden en el que WordPress va a cargar los archivos de plugins que vaya encontrando, lo que se puede hacer es definir nuestras *Pluggable Functions* dentro de un evento, para que otro desarrollador pueda usar ese mismo evento e insertar sus propias funciones especificando una prioridad más alta.
+
+```php
+<?php
+#my-plugin.php
+
+add_action( 'plugins_loaded', 'load_pluggable_functions', 10 );
+
+function load_pluggable_functions() {
+	require( dir( __FILE__ ) . '/my-pluggable-functions.php' );
+}
+
+#my-pluggable-functions.php
+
+if ( ! function_exists( 'my_function' ) ) :
+function my_function() {
+	_e( 'Hello world!', 'my-plugin' );
+}
+endif;
+
+#third-party-plugin.php
+
+add_action( 'plugins_loaded', 'load_third_party_functions', 1 );
+
+function load_third_party_functions() {
+	require( dir( __FILE__ ) . '/third-party-functions.php' );
+}
+
+#third-party-functions.php
+
+function my_function() {
+	_e( 'Hello world!', 'my-plugin' );
 }
 ```
 
+De esta forma, otro desarrollador puede usar el mismo evento que usamos nosotros para cargar sus funciones, pero al cargarse su archivo de funciones con una prioridad más alta que el nuestro, las suyas se van a declarar primero, y las nuestras van a ser ignoradas, al no pasar el chequeo de `if( ! function_exists() )`.
 
-Observe que si se conecta una función básica como esta el original ya no está disponible.
+Si bien esta es una práctica muy útil a la hora de hacer nuestros plugins extensibles, tampoco tenemos que abusar de ella. Va a haber muchas ocasiones en las que no queremos que nuestras funciones puedan ser redeclaradas en plugins de terceros, y solamente deberíamos permitirlo con aquellas que sepamos que alguien puede llegar a necesitar personalizar.
 
------------------
+### Variables globales
 
+En PHP, al crear una función también se crea un nuevo contexto cerrado para el bloque de código en el que se encuentra. Esto tiene la consecuencia de que las variables que se encuentran por fuera de la función no sean accesibles.
 
-## Funciones extensibles (by-pass)
+```php
+<?php
+$foo = 'Hola mundo';
 
-El *by-passing* es una práctica que permite crear una vía alternativa para el proceso interno de una función. A diferencia de las funciones extensibles, no se reemplaza una función por otra, sino que se ingresa a la función original, se ejecuta un proceso diferente, y se detiene la ejecución del resto del código. En WordPress podemos lograrlo por medio del uso de filtros.
+function saludar() {
+  $bar = 'Hello world';
 
+  echo $bar; // Imprime "Hello world".
+
+  echo $foo; // No imprime nada.
+}
+
+saludar();
+?>
 ```
-// Función original:
-function my_original_function() {
-  if ( apply_filters( 'my_original_function_hook', false ) ) {
-    return; // Se detiene la ejecución de la función en caso de que el filtro resuelva "true".
-  }
-  
-  echo 'Hola mundo!';
+
+Para poder acceder a variables que se encuentran fuera de una función, dichas variables deben ser declaradas como **globales**. Esto puede hacerse usando la palabra clave `global` al momento de inicializar o asignar un valor a la variable.
+
+```php
+<?php
+global $foo = 'Hola mundo'; // Declaración de global en asignación.
+?>
+```
+
+Otra forma válida de hacerlo es la siguiente:
+
+```php
+<?php
+global $foo; // Declaración de global en inicialización.
+
+$foo = 'Hola mundo';
+?>
+```
+
+Para poder recuperar el valor de una variable global dentro de una función, necesitamos inicializar la variable como global. De esta manera, PHP reconoce que se trata de la misma variable previamente declarada.
+
+```php
+<?php
+global $foo = 'Hola mundo';
+
+function saludar() {
+  global $foo;
+
+  $bar = 'Hello world';
+
+  echo $bar; // Imprime "Hello world".
+
+  echo $foo; // Imprime "Hola mundo".
 }
 
-// Función de by-pass:
-function my_by_pass_function() {
-  echo 'Chau mundo!';
-  
-  return true; // Devolvemos "true". Esto es importante para que la ejecución de la función original se detenga.
+saludar();
+?>
+```
+
+Las variables globales se guardan dentro de la supervariable `$_GLOBALS`, que contiene un array cuyas claves son los nombres de todas las variables globales. Sabiendo esto, también podríamos acceder a la variable global usando `$_GLOBALS`.
+
+```php
+<?php
+global $foo = 'Hola mundo';
+
+function saludar() {
+  $bar = 'Hello world';
+  $foo = $_GLOBALS['foo'];
+
+  echo $bar; // Imprime "Hello world".
+
+  echo $foo; // Imprime "Hola mundo".
 }
 
-// Seteamos el filtro de by pass:
-add_filter( 'my_original_function_hook', 'my_by_pass_function' );
-
-// Llamamos a la función original:
-my_original_function(); // Se imprime 'Chau mundo!'
+saludar();
+?>
 ```
 
 ---
 
-# Programación Orientada a Eventos
+## Programación Orientada a Eventos
 
 Un primer paso muy recomendable para empezar a entender cómo funciona WordPress a nivel código, independientemente de si trabajamos con plugins o themes, es empezar a entender el paradigma de programación orientada a eventos, ya que en él se basan la mayoría de las posibilidades de extensión que tenemos disponibles. Es importantísimo conocer este paradigma a la hora de interactuar con el código de WordPress, ya que desconocerlo puede llevar a muchísimo trabajo innecesario, o a mucho tiempo perdido en mantenimiento, mejoras y arreglo de bugs.
 
-### ¿Qué es la programación orientada a eventos?
+#### ¿Qué es la programación orientada a eventos?
 
 La herramienta principal que nos ofrece WordPress para construir nuestras propias extensiones, ya se trate de plugins o themes, es un conjunto de funciones al que comúnmente se llama *[Plugin API](https://codex.wordpress.org/Plugin_API)*.
 
@@ -223,7 +460,7 @@ evento( 'mesa_servida' );
 
 Ahora bien, conociendo los conceptos fundamentales de la programación orientada a eventos, podemos ver de qué manera WordPress nos permite aplicarlos para construir nuestras extensiones. Para esto, WordPress nos ofrece dos diferentes tipos de eventos: acciones y filtros.
 
-### Acciones
+#### Acciones
 
 Uno de los dos tipos de eventos ofrecidos por WordPress se llama ***[Action](https://codex.wordpress.org/Plugin_API#Actions)***, o acción. El propósito de las acciones es permitir la ejecución de procesos propios durante la carga de una página. Algunos ejemplos de estos procesos pueden consistir en modificar información de la base de datos, enviar un mail, registrar nuevos tipos de contenido, imprimir cierta información en pantalla, etc.
 
@@ -380,7 +617,7 @@ Noten que no estamos llamando directamente a `do_action( 'publish_posts' );`. Es
 
 - - -
 
-### Filtros
+#### Filtros
 
 El otro tipo de eventos que nos ofrece WordPress son los ***[Filters](https://codex.wordpress.org/Plugin_API#Filters)***, o filtros. Este tipo de eventos ya no pone tanto el foco en la ejecución de procesos, como pasa con las acciones, sino en la manipulación de datos internos de la aplicación. Por ejemplo, un filtro puede ser utilizado para cambiar el valor de una variable, o modificar el valor de retorno de una función. Usos típicos de los filtros pueden ser activar o desactivar ciertas características de la aplicación, modificar alguna parte del HTML que se va a imprimir, cambiar valores de configuración o alterar consultas a la base de datos.
 
@@ -461,7 +698,7 @@ Una vez que guardemos este código en nuestro plugin y refresquemos cualquier p�
 
 - - -
 
-### Remover eventos del registro
+#### Remover eventos del registro
 
 Algo que podemos llegar a necesitar mientras desarrollamos nuestras propias extensiones es que ciertas acciones o filtros se dejen de ejecutar. Por ejemplo, podemos querer desactivar alguna funcionalidad nativa de WordPress, o de un plugin de terceros, o que alguna de nuestras acciones o filtros solamente se ejecuten en determinados contextos. Para lograr eso, WordPress nos ofrece cuatro funciones:
 
@@ -517,7 +754,7 @@ do_action( 'my_action' );
 $my_value = apply_filters( 'my_filter', 'some value' );
 ```
 
-De esta manera logramos que las funciones que asignamos previamente con `add_action()` y `add_filter()` dejen de ejecutarse. 
+De esta manera logramos que las funciones que asignamos previamente con `add_action()` y `add_filter()` dejen de ejecutarse.
 Para usar correctamente `remove_action()` y `remove_filter()` necesitamos tener en cuenta dos cosas: en primer lugar, tienen que ser llamadas después de que los callbacks hayan sido asignados, pero antes de que se ejecuten las acciones. En segundo lugar, ambas funciones reciben un tercer parámetro, que es equivalente a la prioridad con la que se asignaron previamente los callbacks que ahora estamos removiendo del registro. Este parámetro no es obligatorio, y su valor por defecto es 10. Si no lo especificamos, tenemos que asegurarnos de que la prioridad del callback también sea 10, o que tampoco esté especificada.
 
 Por último, tenemos las funciones `remove_all_actions()` y `remove_all_filters()`. Estas nos permiten remover todos los callbacks que hayan sido asignados a una acción o filtro determinados, sin necesidad de especificar más que el nombre del evento. Por ejemplo, podemos suponer que tenemos dos callbacks asignados a una acción y otros dos callbacks asignados a un filtro.
@@ -587,13 +824,13 @@ $my_value = apply_filters( 'my_filter', 'some value' );
 
 Tenemos que tener en cuenta que ambas son funciones para usar con mucho cuidado, ya que no es muy común querer remover todos los callbacks para un evento. Sin embargo, es bueno saber que contamos con ellas, y suelen ser muy útiles mientras estamos desarrollando nuestras extensiones, particularmente con fines de testing.
 
-### Conclusiones
+#### Conclusiones
 
 Un buen manejo y comprensión de la Plugin API permiten agregarle a WordPress cualquier tipo de funcionalidad que pretendamos. Pero más allá del trabajo que podemos hacer con WordPress, dominar el paradigma de programación orientada a eventos puede abrirnos muchas puertas en el mundo del desarrollo de software en general, y en particular en el desarrollo web, donde se demuestra cada vez más útil, siendo adoptado por muchos otros proyectos open source, como jQuery, Drupal o Symfony.
 
 ---
 
-# Sidebars
+## Sidebars
 
 Podemos crear barras laterales para un theme mediante una serie de funciones. Las funciones listadas a continuación  se utilizan para añadir barras laterales funcionales al tema.
 
@@ -646,11 +883,11 @@ El valor de retorno podría utilizarse para determinar si se va a mostrar una ba
         <?php endif; ?>
     </ul>
 ```
-    
+
 Si las barras laterales fueron registradas con un número, deberían ser recuperadas con un número. Si tenían nombres cuando se las registró, se deberían utilizar sus nombres.
 
-# Menús de Navegación
-En la sección *Appearance > Menus* podemos crear nuestros propios menús de navegación, los cuales podemos reutilizar como widgets, asignándolos a una sidebar. Sin embargo, existen casos en los cuales necesitamos arear navegables fijas dentro de nuestros themes. 
+## Menús de Navegación
+En la sección *Appearance > Menus* podemos crear nuestros propios menús de navegación, los cuales podemos reutilizar como widgets, asignándolos a una sidebar. Sin embargo, existen casos en los cuales necesitamos arear navegables fijas dentro de nuestros themes.
 
 WordPress nos permite registrar estas áreas navegables por medio de las funciones `register_nav_menu()` y `register_nav_menus()`.
 
@@ -681,7 +918,7 @@ function register_my_menu() {
 }
 ```
 
-# Qué es un plugin y para qué sirve
+## Qué es un plugin y para qué sirve
 
 En un sentido conceptual, podríamos decir que todo sitio o aplicación web se divide en tres partes: **contenido**, **presentación** y **funcionalidad**. **El contenido es aquella información variable que nuestro sitio o aplicación le muestra al usuario final**, y que alguien con los permisos adecuados puede agregar, modificar o eliminar. En la mayoría de las aplicaciones modernas es provisto de manera externa por un usuario, sin necesidad de modificar de manera manual los archivos que constituyen a la aplicación, y normalmente queda guardado en algún tipo de base de datos. **La presentación es la forma en la que esa información se le muestra al usuario**, y tiene que ver con la implementación de algún tipo de diseño gráfico sobre una interfaz; es básicamente cómo se ve nuestro proyecto. **La funcionalidad tiene que ver con todos los procesos internos que manejan el contenido** (por ejemplo la carga, edición y eliminación) y lo dejan preparado para ser presentado al usuario.
 
@@ -693,7 +930,7 @@ Teniendo en cuenta todo esto, podemos decir que **los themes, más que tener que
 
 A partir de tener presentes cuáles son estas diferencias y similitudes conceptuales básicas entre plugins y themes, podemos empezar a construir nuestros propios plugins.
 
-# Cómo crear un plugin básico
+## Cómo crear un plugin básico
 
 ![](https://www.dropbox.com/s/v4x0ws69lhsoy21/Screenshot%202016-07-19%2015.33.36.png?dl=0&raw=1)
 En un sentido reduccionista, los plugins son simples archivos PHP que se encuentran en la carpeta `wp-content/plugins` de nuestra instalación de WordPress. El paquete de instalación de WordPress incluye dos plugins: **Akismet** y **Hello Dolly**. Hello Dolly es un plugin que consiste en un simple archivo llamado `hello.php`, y lo podemos encontrar suelto en la carpeta de plugins. Akismet es más complejo: consiste en varios archivos, y por una cuestión de orden lo vamos a encontrar en su propia carpeta. Sin embargo, dentro de esa carpeta vamos a encontrar un archivo principal llamado `akismet.php`. La similitud entre estos dos archivos, `hello.php` y `akismet.php`, es que ambos cuentan con una sección de código comentado al inicio de cada uno, conteniendo una serie de definiciones con los datos de cada plugin. Esa porción de código, que funciona a manera de encabezado del plugin, es lo que permite que WordPress reconozca el archivo como el principal de un plugin, y que a partir de ahí lo pueda mostrar en la lista de la sección *Plugins* de nuestra instalación.
@@ -758,7 +995,7 @@ add_action( 'admin_notices', 'hello_dolly' );
 
 No importa ahora mismo cómo funciona esta interacción entre funciones por medio de acciones, porque la vamos a ver con más detalle en los próximos capítulos. Lo que es importante saber ahora es que, una vez que creamos nuestro archivo principal de plugin y activamos el plugin desde el panel de administración, dentro de ese archivo podemos hacer cualquier cosa que PHP nos permita hacer.
 
-# Shortcodes
+## Shortcodes
 
 Los shortcodes de WordPress son pequeños códigos que puedes añadir en el editor de WordPress. Se usan para añadir funciones al contenido de tus entradas y páginas sin tener que escribir un script cada vez que necesites hacer esa tarea.
 
@@ -873,8 +1110,8 @@ add_filter( 'term_description', 'shortcode_unautop');
 add_filter( 'term_description', 'do_shortcode' );
 ```
 
-# Tipos de Contenido
-## Post Types predefinidos
+## Tipos de Contenido
+### Post Types predefinidos
 
 Al construir una aplicación o un sitio web con cierto nivel de complejidad, es muy común que en algún momento se necesite algún tipo de contenido diferente de los que ya tenemos, alguna nueva entidad para la que sea posible crear, editar y modificar registros.
 
@@ -888,7 +1125,7 @@ En el caso de WordPress, esta serie de herramientas esta cubierta por la API de 
 
 Por defecto, con su instalación básica, WordPress presenta cinco tipos de contenido: posts, páginas, revisiones, archivos y menús de navegación. Todos tienen diferencias entre ellos, las cuales se pueden notar al cargar o editar información, y todos están construidos usando la API de Post Types. Esta API permite manejar diferentes tipos de datos para diferentes tipos de contenidos de una forma estandarizada.
 
-## Custom Post Types
+### Custom Post Types
 
 Una necesidad típica al construir sitios con WordPress es la de gestionar tipos de contenido diferentes de los que se incluyen por defecto. Normalmente esto se logra con la instalación de un plugin que agregue un nuevo post type. También es común encontrarse con themes que lo hagan, pero no es una práctica recomendable, salvo en casos muy específicos, ya que al cambiar el theme se perdería el nuevo post type.
 
@@ -904,7 +1141,7 @@ function portfolio_create_project_post_type() {
 	register_post_type( 'project', array(
 			/**
 			 * @arg $labels
-			 * 
+			 *
 			 * Define etiquetas de texto utilizadas por el post type.
 			 */
 			'labels' => array(
@@ -913,7 +1150,7 @@ function portfolio_create_project_post_type() {
 			),
 			/**
 			 * @arg $supports
-			 * 
+			 *
 			 * Define características soportadas por el post type.
 			 */
 			'supports' => array(
@@ -935,7 +1172,7 @@ Para crear un nuevo post type, vamos a usar la función `register_post_type()` a
 
 De esta manera, cuando guardemos nuestro código, vamos a ver una nueva sección en el menú de administración: ***Projects***. Podemos cargar un nuevo proyecto, con su correspondiente título, contenido, extracto, autor e imagen destacada, y una vez que lo guardemos WordPress nos va a dar un link para visualizarlo en el front-end. Si todo anduvo bien, deberíamos ver algo muy parecido a un post, quizás con algunas diferencias menores, dependiendo del theme que estemos usando.
 
-# Taxonomías
+## Taxonomías
 
 Los posts cuentan con dos tipos de taxonomías para organizar contenidos: las categorías y las etiquetas (o tags). La diferencia fundamental entre estos dos tipos de taxonomías es que las categorías pueden organizarse jerárquicamente, es decir que puede haber categorías principales, y además otras secundarias que las tengan como padres, mientras que las etiquetas están siempre al mismo nivel.
 
@@ -956,7 +1193,7 @@ function portfolio_register_category_taxonomy() {
 				'singular_name' => __( 'Category', 'portfolio' ),
 			),
             'hierarchical' => true,
-		) 
+		)
 	);
 }
 
@@ -969,7 +1206,7 @@ function portfolio_register_tag_taxonomy() {
                 'singular_name' => __( 'Tag', 'portfolio' ),
             ),
             'hierarchical' => false,
-        ) 
+        )
     );
 }
 
@@ -990,7 +1227,7 @@ function portfolio_project_categories( $content ) {
 
 		if ( is_array( $terms ) ) {
 			$category_links = array();
- 
+
 			 foreach ( $terms as $term ) {
 				 $category_links[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . $term->name . '</a>';
 			 }
@@ -1013,7 +1250,7 @@ function portfolio_project_tags( $content ) {
 
 		if ( is_array( $terms ) ) {
 			$tag_links = array();
- 
+
 			 foreach ( $terms as $term ) {
 				 $tag_links[] = '<a href="' . esc_url( get_term_link( $term ) ) . '">' . $term->name . '</a>';
 			 }

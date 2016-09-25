@@ -1,8 +1,8 @@
-[Paradigma funcional (2)]
+# Clase 5
 
----
+[comment]: # (Paradigma funcional II)
 
-# Custom Fields y Meta Boxes
+## Custom Fields y Meta Boxes
 
 La manera más rápida de agregar valores extra a los contenidos de un sitio es por medio del uso de campos personalizados, o *Custom Fields*. Estos campos personalizados se hacen visibles en la pantalla de creación o edición de un contenido cuando se chequea el campo correspondiente en *Opciones de Pantalla*. Esto va a hacer que WordPress muestre un menú en el que se puede agregar un nuevo campo con un nombre a elección y su correspondiente valor.
 
@@ -18,7 +18,7 @@ function apply_title_color( $title ) {
 	if ( $color ) {
 		$title = '<span style="color: ' . $color . '">' . $title . '</span>';
 	}
-	
+
 	return $title;
 }
 ```
@@ -82,7 +82,7 @@ function my_metabox_callback() {
 }
 ```
 
-Aunque con este código todavía no es posible cargar nueva información, ya puede verse una nueva meta box en las pantallas de edición y creación de posts. La función `add_meta_box()` también acepta otros tres parámetros opcionales más: `$context`, para definir en qué sección de la pantalla va a aparecer la meta box; `$priority`, para indicar qué prioridad tiene dentro del contexto en el que se la registra; y `$callback_args`, para enviarle información adicional a nuestro callback dentro de un array. 
+Aunque con este código todavía no es posible cargar nueva información, ya puede verse una nueva meta box en las pantallas de edición y creación de posts. La función `add_meta_box()` también acepta otros tres parámetros opcionales más: `$context`, para definir en qué sección de la pantalla va a aparecer la meta box; `$priority`, para indicar qué prioridad tiene dentro del contexto en el que se la registra; y `$callback_args`, para enviarle información adicional a nuestro callback dentro de un array.
 
 El siguiente paso es imprimir, a través del callback, algún tipo de información que un usuario pueda cargar. Para eso simplemente puede crearse un campo de formulario dentro de la función e imprimirlo.
 
@@ -221,7 +221,7 @@ Por último, debe confirmarse que los datos que se van a ingresar tengan el form
 
 En el ejemplo se usa la función `esc_html()` para asegurarse de que cualquier texto que pueda ser ingresado como HTML se convierta en texto plano. Hay una cantidad bastante grande de [funciones de sanitización](https://codex.wordpress.org/Validating_Sanitizing_and_Escaping_User_Data) provistas por WordPress, las cuales se pueden chequear en la documentación oficial. Algunas de esas funciones son más recomendables para mostrar datos (lo cual se llama *escape*), y otras son preferibles a la hora de guardarlos (lo cual se llama *validación*).
 
-# Menús de administración
+## Menús de administración
 
 Es bastante corriente que nuestros plugins necesiten algún tipo de configuración global, más allá de la información de podemos manipular por medio de post types y meta boxes. Para estos casos, generalmente necesitamos crear alguna pantalla de administración propia de nuestro plugin, donde el usuario pueda configurar las opciones que definan su funcionamiento.
 
@@ -229,7 +229,7 @@ Con este fin es que WordPress nos ofrece tres tipos de herramientas: **menús de
 
 Los menús de administración son esas secciones que vemos en la barra lateral de navegación en nuestro panel de administración. Cada uno de ellos tiene un link principal, y además pueden tener un segundo nivel de links, que vemos cuando estamos navegando un menú o cuando pasamos el mouse por encima del link principal. Estos links secundarios son lo que llamamos sub-menús.
 
-Por último tenemos las páginas de opciones, que son aquellos links que vemos ubicados debajo del menú *Settings* (o *Configuración*). 
+Por último tenemos las páginas de opciones, que son aquellos links que vemos ubicados debajo del menú *Settings* (o *Configuración*).
 
 Para agregar un menú usamos la función `add_menu_page()`, y la asignamos como acción al evento `admin_menu`. Con este ejemplo de código podemos crear un menú y asociarle una interfaz muy básica.
 
@@ -238,7 +238,7 @@ Para agregar un menú usamos la función `add_menu_page()`, y la asignamos como 
 add_action( 'admin_menu', 'portfolio_menu_page' );
 
 function portfolio_add_menu_page() {
-    add_menu_page( 
+    add_menu_page(
         __( 'Portfolio Settings', 'portfolio' ), // Texto del título que aparece en la página de opciones.
         __( 'Portfolio', 'portfolio' ),          // Texto que aparece en el link principal del menú.
         'manage_options',                        // Permiso que debe tener el usuario para ver el menú.
@@ -246,9 +246,9 @@ function portfolio_add_menu_page() {
         'portfolio_menu_page',                   // Nombre de la función que imprime el HTML de la página de opciones.
         'dashicons-art',                         // Icono del menú. Podemos usar Dashicons o una URL.
         10,                                      // Posición en la que aparece el menú en la barra de navegación.
-    ); 
+    );
 }
- 
+
 function portfolio_menu_page(){
     _e( 'Set Portfolio options here.', 'portfolio' );  
 }
@@ -265,15 +265,15 @@ El procedimiento es muy similar a agregar un menú, pero usando la función `add
 add_action( 'admin_menu', 'portfolio_menu_page', 999 );
 
 function portfolio_add_menu_page() {
-    add_options_page( 
+    add_options_page(
         __( 'Portfolio Settings', 'portfolio' ), // Texto del título que aparece en la página de opciones.
         __( 'Portfolio', 'portfolio' ),          // Texto que aparece en el link principal del menú.
         'manage_options',                        // Permiso que debe tener el usuario para ver el menú.
         'portfolio-settings',                    // Slug, string que permite identificar internamente el menú.
         'portfolio_menu_page',                   // Nombre de la función que imprime el HTML de la página de opciones.
-    ); 
+    );
 }
- 
+
 function portfolio_menu_page(){
     _e( 'Set Portfolio options here.', 'portfolio' );  
 }
@@ -297,9 +297,9 @@ function portfolio_add_menu_page() {
         'manage_options',                        // Permiso que debe tener el usuario para ver el menú.
         'portfolio-settings',                    // Slug, string que permite identificar internamente el menú.
         'portfolio_menu_page',                   // Nombre de la función que imprime el HTML de la página de opciones.
-    ); 
+    );
 }
- 
+
 function portfolio_menu_page(){
     _e( 'Set Portfolio options here.', 'portfolio' );  
 }
@@ -309,7 +309,7 @@ Al refrescar el browser van a ver que el link cambió nuevamente de ubicación, 
 
 Algo importante a tener en cuenta es que, si estamos mirando la página de administración que acabamos de crear, al cambiar el link de lugar y refrescar la página, WordPress puede mostrar un error. Esto no es porque hayamos hecho algo mal, sino porque al cambiar la ubicación del link también puede cambiar la URL que se le asigna, pero con volver a la página principal del panel de administración vamos a poder ver el link en su nueva ubicación, y acceder a él desde su nueva URL sin problemas.
 
-# Options API
+## Options API
 
 Ya vimos cómo crear una página de administración para nuestro plugin, pero todavía no podemos guardar opciones a través de esa página. Para poder gestionar nuestras opciones, WordPress nos ofrece la Options API, un conjunto de funciones muy sencillas para manipular configuraciones internamente en nuestros plugins.
 
@@ -325,7 +325,7 @@ function portfolio_menu_page() {
 
 	?>
 		<form method="post">
-			<input id="portfolio-settings-show-logged-only" name="portfolio_settings[show_logged_only]" type="checkbox" value="true" <?php checked( $checked ); ?>/> 
+			<input id="portfolio-settings-show-logged-only" name="portfolio_settings[show_logged_only]" type="checkbox" value="true" <?php checked( $checked ); ?>/>
 			<label for="portfolio-settings-show-logged-only"><?php _e( 'Only show projects to logged-in users', 'portfolio' ); ?></label>
 
 			<input type="submit" class="button button-save" value="<?php _e( 'Save options', 'portfolio' ); ?>" />
@@ -412,7 +412,7 @@ function portfolio_project_show_logged_in_only( $content ) {
 
 De todas maneras, si bien la Options API es la herramienta que WordPress usa internamente y recomienda para manejar configuraciones propias, a la hora de manejar el guardado de datos y generación de campos en menús de administración, no es la mejor solución que tenemos a nuestro alcance, ya que tiene una gran cantidad de limitaciones. Es importante entender cómo funciona y cuáles son sus funciones principales, porque en desarrollo de plugins es casi inevitable usarla, pero para lo que acabamos de hacer, la mejor solución que nos ofrece WordPress es la ***Settings API***, que es el tema del próximo capítulo.
 
-# Settings API
+## Settings API
 
 Ya vimos cómo se maneja la *Options API* para guardar la configuración de nuestro plugin, y recomendamos usar una única opción para guardar todos nuestros datos, construyendo un array. También vimos que para guardar nuestra configuración tenemos que hacer una serie de chequeos de seguridad que pueden llegar a ser tediosos, o pueden volver nuestras funciones muy largas y complicadas de mantener.
 
@@ -432,7 +432,7 @@ function portfolio_settings_api_init() {
 		'portfolio_general_settings_section_callback', // Nombre de la función que imprime el HTML de la sección.
 		'portfolio-settings'                           // Slug del menú donde debe aparecer la sección.
 	);
- 	
+
  	// Registramos un campo asociado a la sección.
  	add_settings_field(
 		'portfolio-settings-show-logged-only-setting',              // Texto del tag `id` del campo.
@@ -441,7 +441,7 @@ function portfolio_settings_api_init() {
 		'portfolio-settings',                                       // Slug del menú donde debe aparecer el campo.
 		'portfolio-general-settings-section'                        // ID de la sección a la que pertenece el campo.
 	);
- 	
+
  	// Registramos nuestro campo como setting.
 	// El primer parámetro es el nombre de la opción que estamos usando para guardar la configuración.
 	// El segundo parámetro es el identificador de nuestra setting dentro del array de opciones.
@@ -461,7 +461,7 @@ function portfolio_settings_show_logged_only_callback() {
 	$checked = isset( $settings['show_logged_only'] ) ? $settings['show_logged_only'] : false;
 
 	?>
-		<input id="portfolio-settings-show-logged-only" name="portfolio_settings[show_logged_only]" type="checkbox" value="true" <?php checked( $checked ); ?>/> 
+		<input id="portfolio-settings-show-logged-only" name="portfolio_settings[show_logged_only]" type="checkbox" value="true" <?php checked( $checked ); ?>/>
 		<label for="portfolio-settings-show-logged-only"><?php _e( 'Only show projects to logged-in users', 'portfolio' ); ?></label>
 	<?php
 }

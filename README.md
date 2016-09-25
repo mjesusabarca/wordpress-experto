@@ -4,13 +4,13 @@
 
 El curso está dirigido a alumnos que cuenten con conocimientos de WordPress desde una perspectiva de usuario (instalación, utilización de panel de control, plugins y themes) y deseen profundizar en la creación de sus propias extensiones a través de la incorporación de conocimientos de programación con PHP y JavaScript.
 
-## Pre-requisitos:
+## Pre-requisitos
 
 * Manejo de WordPress a nivel usuario (temas de WordPress Nivel 1 o equivalente)
-* Completar el curso de [HTML y CSS de Codecademy]  (<https://www.codecademy.com/learn/web>)
-* Completar el curso de [PHP de Codecademy]  (<https://www.codecademy.com/es/learn/php>)
+* Completar el curso de [HTML y CSS de Codecademy](https://www.codecademy.com/learn/web)
+* Completar el curso de [PHP de Codecademy](https://www.codecademy.com/es/learn/php)
 
-## Programa:
+## Programa
 
 ### [Clase 1: Herramientas, HTML, CSS y templates](clase01.md)
 
@@ -32,7 +32,7 @@ El curso está dirigido a alumnos que cuenten con conocimientos de WordPress des
     * Edición de HTML y estilos del theme
     * Inspector de código en Chrome y Firefox
   * Trabajo Práctico :white_check_mark:
- 
+
 ### [Clase 2: PHP y themes](clase02.md)
 
   * Intro a PHP
@@ -49,7 +49,7 @@ El curso está dirigido a alumnos que cuenten con conocimientos de WordPress des
     * Child themes
     * Carga de estilos y scripts
   * Trabajo Práctico :white_check_mark:
-  
+
 ### [Clase 3: Paradigma funcional, plugins y programación orientada a eventos](clase03.md)
 
   * Paradigma funcional (I)
@@ -89,7 +89,7 @@ El curso está dirigido a alumnos que cuenten con conocimientos de WordPress des
     * Manejo de bases de datos en PHP: conexión y manipulación
     * Manejo de bases de datos en WordPress
   * Trabajo Práctico :white_check_mark:
- 
+
 ### [Clase 5: Paradigma funcional, post types y opciones personalizadas](clase05.md)
 
   * Paradigma funcional (II)
@@ -103,7 +103,7 @@ El curso está dirigido a alumnos que cuenten con conocimientos de WordPress des
     * Options API
     * Settings API
   * Trabajo Práctico :white_check_mark:
-    
+
 ### [Clase 6: Programación orientada a objetos, loops y widgets](clase06.md)
 
   * Programación orientada a objetos
@@ -125,7 +125,7 @@ El curso está dirigido a alumnos que cuenten con conocimientos de WordPress des
 ### [Clase 7: Workshop, traducción y JavaScript](clase07.md) :large_blue_circle:
 
   * Workshop
-    * Creación/optimización de theme o plugin propio según los temas tratados en clase 
+    * Creación/optimización de theme o plugin propio según los temas tratados en clase
   * Internacionalización y localización
     * Diferencia entre i18n y l10n
     * Internacionalización de textos
@@ -141,7 +141,7 @@ El curso está dirigido a alumnos que cuenten con conocimientos de WordPress des
 ### [Clase 8: Proyecto final y asincronismo](clase08.md) :checkered_flag:
 
   * Proyecto final
-    * Finalización de theme o plugin propio según los temas tratados en clase 
+    * Finalización de theme o plugin propio según los temas tratados en clase
   * Asincronismo
     * Presentación de AJAX
     * Timeout y eventos de cliente

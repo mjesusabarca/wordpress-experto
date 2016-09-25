@@ -1,8 +1,11 @@
-[Workshop - consigna]
+# Clase 7
 
----
+[comment]: # (Faltantes:)
+[comment]: # ([Workshop - consigna])
+[comment]: # ([Generación de traducciones])
+[comment]: # ([Intro a JavaScript])
 
-# Internacionalización y Localización
+## Internacionalización y Localización
 
 Una posibilidad que WordPress ofrece al hacer la instalación es elegir el lenguaje en el que se va a mostrar nuestro sitio. Gracias a esta opción, si se selecciona un lenguaje que no sea inglés, WordPress va a traducir automáticamente todos los textos que estén preparados para ser mostrados en el idioma elegido.
 
@@ -18,6 +21,7 @@ El requisito de la palabra clave es el más sencillo de cumplir: basta con agreg
  * Plugin Name: My Plugin
  * Text Domain: my-plugin
  */
+ ?>
 ```
 
 Opcionalmente, se puede especificar, en el valor "Domain Path", la ruta relativa a la carpeta donde se encuentren los archivos de traducción que podamos ofrecer por defecto.
@@ -29,6 +33,7 @@ Opcionalmente, se puede especificar, en el valor "Domain Path", la ruta relativa
  * Text Domain: my-plugin
  * Domain Path: languages/
  */
+ ?>
 ```
 
 Una vez que la tenemos, debemos usar la función `load_textdomain()` para que se carguen automáticamente todas las posibles traducciones existentes de nuestro plugin.
@@ -39,6 +44,7 @@ Una vez que la tenemos, debemos usar la función `load_textdomain()` para que se
  * Plugin Name: My Plugin
  * Text Domain: my-plugin
  * Domain Path: languages/
+ ?>
  */
 
 load_plugin_textdomain( 'my-plugin' );
@@ -71,6 +77,7 @@ function my_filter_callback( $value ) {
 $my_value = apply_filters( 'my_filter', 'some value' );
 
 do_action( 'my_action' );
+?>
 ```
 
 Un problema con el que es común encontrarse es que parte del texto a traducir dependa de valores variables. Esto es justamente un problema porque `gettext`, la librería que usa WordPress para gestionar sus traducciones, no puede leer información dinámica dentro de las cadenas de texto a traducir. Por lo tanto, algo así no puede ser traducido:
@@ -78,6 +85,7 @@ Un problema con el que es común encontrarse es que parte del texto a traducir d
 ```php
 <?php
 _e( 'Hello World! The current year is ' . date( 'Y' ), 'my-plugin' );
+?>
 ```
 
 Para resolver este problema, podemos combinar nuestros textos a traducir con las funciones nativas de PHP `printf()` y `sprintf()`. El ejemplo anterior se puede replantear de manera correcta de esta forma:
@@ -85,12 +93,13 @@ Para resolver este problema, podemos combinar nuestros textos a traducir con las
 ```php
 <?php
 printf( __( 'Hello World! The current year is %s', 'my-plugin' ), date( 'Y' ) );
+?>
 ```
 
 Por último, se puede ofrecer una plantilla con textos localizables. La plantilla se trata de nada más que un archivo de texto con el nombre del dominio y con extensión POT (*Portable Object Template*), y un formato como el siguiente:
 
 ```
-# my-plugin.pot
+## my-plugin.pot
 msgid "Hello world!"
 msgstr ""
 
@@ -103,9 +112,3 @@ La propiedad `msgid` corresponde al texto original a traducir, y `msgstr` es la 
 Muchas veces podemos contar con un número bastante grande de textos a traducir, por lo cual no es muy viable incluir todos manualmente en el archivo POT. Para esto tenemos programas que pueden generar el archivo POT de manera automática, como por ejemplo [Poedit](https://poedit.net/).
 
 Estos son simplemente los conceptos básicos de internacionalización y localización, y es todo lo que hace falta saber al momento de crear plugins que puedan ser traducidos.
-
-[Generación de traducciones]
-
----
-
-[Intro a JavaScript]
