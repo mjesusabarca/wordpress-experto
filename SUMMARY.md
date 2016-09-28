@@ -1,7 +1,7 @@
 # Summary
 
-* [Introduction](README.md)
+* [Acerca Del Curso](README.md)
 * [Destinatarios](Destinatarios.md)
 * [Pre-requisitos](Pre-requisitos.md)
-* Temario
+* [Temario](Temario.md)
 
