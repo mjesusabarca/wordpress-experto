@@ -10,6 +10,14 @@ Conviértete en un Desarrollador Avanzado en WordPress con nuestro curso de Nive
 * Aprender exhaustivamente acerca de cómo funciona WordPress internamente.
 * Aplicar las prácticas más recomendadas de la actualidad en el sector.
 
+## Información
+
+* 8 clases (4 horas c/u)
+* 32 horas
+* 8 semanas
+* 8 challenges
+* 6 trabajos prácticos
+
 
 
 
