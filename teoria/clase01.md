@@ -1,9 +1,6 @@
 # Clase 1
 
 [comment]: # (Faltantes:)
-[comment]: # [(Intro a HTML)]
-[comment]: # [(Intro a CSS)]
-[comment]: # [(Intro a HTML)]
 [comment]: # [(Modificación de Underscores)]
 
 ## Tecnologías
@@ -120,3 +117,139 @@ Seguir epecificaciones estandarizadas para escribir código ayuda a prevenir err
 * [Some Thoughts On Writing Accessible Code](http://www.andrezrv.com/2014/05/09/thoughts-writing-accesible-code/)
 * [More Thoughts on Writing Accessible Code](http://www.andrezrv.com/2014/08/07/thoughts-writing-accessible-code/)
 * [The Single Biggest Mistake Programmers Make Every Day](https://medium.com/javascript-scene/the-single-biggest-mistake-programmers-make-every-day-62366b432308)
+
+## Introducción a HTML
+
+Dado que WordPress PHP está creado con PHP, que PHP es un lenguaje de procesamiento de texto pensado para desarrollo de sitios web, y que los sitios web se escriben usando HTML, a lo hora de trabajar con WordPress a nivel código es necesario tener al menos un conocimiento básico acerca de cómo opera HTML y cómo usarlo.
+
+HTML significa "HyperText Markup Language" ("lenguaje de marcado de hipertexto", en español), y fue creado en 1993 por Tim Berners-Lee, con la intención de proponer un lenguaje estándar para la creación de sitios web. Tal como su nombre lo indica, está pensado para la creación de hipertexto: texto enriquecido por medio de la aplicación de distintos tipos de formato.
+
+Al contrario de una definición errónea y bastante común, HTML no es un lenguaje de programación, sino puramente descriptivo. No permite tomar decisiones acerca del funcionamiento de un programa o aplicación, como hacen los lenguajes de programación, sino que solo da la posibilidad de declarar la estructura y el contenido de un documento. Esta característica es propia de los lenguajes de marcado, tales como XML, grupo al cual pertenece HTML.
+
+### Sintaxis
+
+La característica principal de HTML como lenguaje es la aplicación de etiquetas o _tags_ a un documento de texto determinado. Estas etiquetas pueden cumplir con dos propósitos: por un lado, darle información al navegador acerca del documento que está procesando,  y por otro, declarar el contenido y la estructura del documento.
+
+Las etiquetas HTML siguen el siguiente formato:
+
+```php
+<nombre atributo="valor">Contenido</nombre>
+```
+
+El nombre de la etiqueta está relacionado con el propósito que cumple la misma dentro del documento. Por ejemplo, si usamos la etiqueta `<strong>` para envolver texto, estamos indicando que ese texto tiene mayor relevancia, y si usamos `<h1>` estamos indicando un título de primer nivel.
+
+Por ejemplo, el siguiente código mostraría un texto conformado por un título y un párrafo, con parte del texto en negrita:
+
+```php
+<h1>Lorem Ipsum</h1>
+
+<p>
+  <strong>Lorem ipsum</strong> dolor sit amet.
+</p>
+```
+
+Un documento HTML válido debe respetar e incluir ciertas etiquetas, más allá de su contenido concreto. Debe incluir el _doctype_ para indicarle al navegador qué versión de HTML debe utilizar, la etiqueta `html` para encerrar el contenido del documento, la etiqueta `head` para proveer información específica para el navegador, y la etiqueta `body` para contener aquello que verá el visitante de la página.
+
+```php
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+  <h1>Lorem Ipsum</h1>
+
+  <p>
+    <strong>Lorem ipsum</strong> dolor sit amet.
+  </p>
+</body>
+</html>
+```
+
+### Más información
+
+En el [curso de HTML y CSS de Codecademy](https://www.codecademy.com/learn/web) puede encontrarse información más específica acerca de la sintaxis y el uso de HTML, así como varios ejercicios para aprender a usarlo correctamente.
+
+## Introducción CSS
+
+CSS (por "Cascading Style Sheets", u "hojas de estilo en cascada") es un lenguaje creado y utilizado para describir la presentación o el diseño visual de un documento escrito usando un lenguaje de marcado, tal como HTML o XML. Fue creado en 1997 por Håkon Wium Lie  y Bert Bos, mientras trabajaban junto a Tim Berners-Lee (el creador de HTML) en el W3C.
+
+### Enlace
+
+La manera más recomendada de trabajar con CSS consiste en crear un archivo separado con extensión `.css` (por ejemplo, `style.css`), y enlazarlo desde un archivo HTML usando la etiqueta `link`, dentro de `head`.
+
+```php
+<!DOCTYPE html>
+<html>
+ <head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <title></title>
+ </head>
+ <body>
+     ...    
+ </body>
+</html>
+```
+De esta manera, todos los estilos declarados dentro de `style.css`  se aplican al documento HTML desde el cual se lo enlaza.
+
+### Sintaxis
+
+CSS permite aplicar un determinado diseño a un documento por medio de bloques como el siguiente:
+
+```css
+selector {
+    atributo: valor;
+    otro-atributo: valor;
+}
+```
+El selector es el identificador de un elemento o grupo de elementos HTML. Los atributos, con sus respectivos valores, definen qué estilos se le aplicarán a los elementos seleccionados.
+
+Por ejemplo, para aplicarle un texto de color rojo a todos los elementos con la etiqueta `<p>`, debería usarse el siguiente bloque:
+
+```css
+p {
+ color: red;
+}
+```
+
+También pueden identificarse elementos HTML por sus IDs, con el caracter `#`, y clases, usando `.`.
+
+Por ejemplo, suponiendo el siguiente código HTML:
+
+```php
+<div class="post">
+    Lorem ipsum dolor sit amet.
+</div>
+```
+
+Podríamos aplicarle estilos al elemento con clase `post` de la siguiente manera:
+
+```css
+.post {
+ color: red;
+}
+```
+
+Podemos operar de manera similar con IDs.
+
+HTML:
+
+```php
+<header id="site-header">
+    Lorem ipsum dolor sit amet.
+</header>
+```
+
+CSS:
+```css
+#site-header {
+ color: red;
+}
+```
+
+### Más información
+
+En el [curso de HTML y CSS de Codecademy](https://www.codecademy.com/learn/web) puede encontrarse información más específica acerca de la sintaxis y el uso de CSS, así como varios ejercicios para aprender a usarlo correctamente.
