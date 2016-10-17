@@ -1,7 +1,7 @@
 # Clase 1
 
 [comment]: # (Faltantes:)
-[comment]: # [(Modificación de Underscores)]
+[comment]: # (Modificación de Underscores)
 
 ## Tecnologías
 
