@@ -797,10 +797,7 @@ Cabe destacar:
 
 Vamos a incluir también un pantallazo de nuestro theme, para identificarlo mejor desde el back-end. Para esto basta con añadir un archivo screenshot.png a la raíz del theme hijo. Podríamos simplemente utilizar el screenshot del theme padre y añadirle una máscara con el nombre del theme hijo.
 
-<div align="center">
 ![](http://i.imgur.com/i5qFlPr.jpg)
-</div>
-<br>
 
 **3. Archivos**
 
