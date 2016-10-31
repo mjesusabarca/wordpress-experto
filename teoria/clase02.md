@@ -836,7 +836,3 @@ Tel: 655 555 555 – email@email.com
 ```
 
 Es un ejemplo muy sencillo, que pretende servir de base y mostrar cual es el camino para modificar un theme padre a través de un child theme sin tocar el código fuente original. A partir de aquí las posibilidades son infinitas: crear nuevas plantillas, añadir nuevos custom post type, modificar el diseño general del sitio, etc.
-
----
-
-[comment]: # (Carga de estilos y scripts)
