@@ -12,12 +12,18 @@ Conviértete en un Desarrollador Avanzado en WordPress con nuestro curso de Nive
 
 ## Información
 
-* 8 clases (4 horas c/u)
 * 32 horas
 * 8 semanas
 * 8 challenges
 * 6 trabajos prácticos
-
+* Días disponibles:
+ * Lunes y Miércoles
+ * Martes y Jueves 
+ * Sábados
+* Horarios disponibles:
+ * Mañana: 10:00 - 12:00
+ * Noche: 19:00 - 21:00
+ * Turno sábados: 9:30 - 13:30
 
 
 
