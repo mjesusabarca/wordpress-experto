@@ -1,6 +1,6 @@
 # Summary
 
-* [Acerca Del Curso](README.md)
+* [Introducción](README.md)
 * [Qué vas a aprender](despues-del-curso.md)
 * [Destinatarios](Destinatarios.md)
 * [Requisitos](Pre-requisitos.md)
