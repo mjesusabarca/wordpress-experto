@@ -83,7 +83,7 @@
    * Manejo de bases de datos en WordPress
 
 
-## Paradigma funcional y post types 
+## Paradigma funcional (II) y post types 
 
   * Paradigma funcional (II)
     * Funciones anónimas
