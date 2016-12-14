@@ -1,6 +1,6 @@
 # WordPress II
 
-## Herramientas, HTML, CSS 
+## Herramientas, HTML y CSS 
 
   * Herramientas
     * Servidores locales: XAMPP, LAMP, MAMP, WAMP, etc.
