@@ -16,41 +16,36 @@
     * Sintaxis: selectores, propiedades y valores
     * Comparación entre hoja de estilos e inline styles
     
-## Templates 
+## Modificación de templates 
 
-  * Modificación de templates
-    * Creación de un theme básico a partir de Underscores
-    * Edición de HTML y estilos del theme
-    * Inspector de código en Chrome y Firefox
+   * Creación de un theme básico a partir de Underscores
+   * Edición de HTML y estilos del theme
+   * Inspector de código en Chrome y Firefox
 
+## Intro a PHP  
 
-## PHP  
-
-  * Intro a PHP
-    * Propósito
-    * Variables
-    * Constantes
-    * Tipos de datos
-    * Operadores
-    * Estructuras de control
-    * Bucles
+   * Propósito
+   * Variables
+   * Constantes
+   * Tipos de datos
+   * Operadores
+   * Estructuras de control
+   * Bucles
     
-## Themes
+## Intro a themes
 
-  * Intro a themes
-    * Declaración
-    * Jerarquía de templates
-    * Page templates
-    * Child themes
-    * Carga de estilos y scripts
+   * Declaración
+   * Jerarquía de templates
+   * Page templates
+   * Child themes
+   * Carga de estilos y scripts
 
-## Paradigma funcional 
+## Paradigma funcional (I)
 
-  * Paradigma funcional (I)
-    * Funciones
-    * Pluggable functions
-    * Carga de archivos (`include` y `require`)
-    * Variables globales
+   * Funciones
+   * Pluggable functions
+   * Carga de archivos (`include` y `require`)
+   * Variables globales
     
 ## Programación orientada a eventos y Plugins
 
@@ -70,24 +65,22 @@
 
 ## Manejo de datos en PHP 
 
-  * Manejo de datos en PHP
-    * Creación de formularios
-    * Métodos de envío y obtención de datos: `$_REQUEST`, `$_POST` y `$_GET`
-    * Sanitización de datos
-    * Escape de datos
+   * Creación de formularios
+   * Métodos de envío y obtención de datos: `$_REQUEST`, `$_POST` y `$_GET`
+   * Sanitización de datos
+   * Escape de datos
     
 ## MySQL  
 
-  * Intro a MySQL
-    * Herramientas: phpMyAdmin y línea de comando
-    * Estructura de bases de datos
-    * Estructura de tablas
-    * Selección
-    * Inserción
-    * Modificación
-    * Eliminación
-    * Manejo de bases de datos en PHP: conexión y manipulación
-    * Manejo de bases de datos en WordPress
+   * Herramientas: phpMyAdmin y línea de comando
+   * Estructura de bases de datos
+   * Estructura de tablas
+   * Selección
+   * Inserción
+   * Modificación
+   * Eliminación
+   * Manejo de bases de datos en PHP: conexión y manipulación
+   * Manejo de bases de datos en WordPress
 
 
 ## Paradigma funcional y post types 
@@ -99,22 +92,20 @@
     * Campos personalizados
     * Meta Boxes
     
-## Opciones personalizadas   
+## Configuración personalizada de plugins   
 
-  * Configuración personalizada de plugins
-    * Menús de administración
-    * Options API
-    * Settings API
+   * Menús de administración
+   * Options API
+   * Settings API
 
 ## Programación orientada a objetos 
 
-  * Programación orientada a objetos
-    * Clases
-    * Propiedades
-    * Constantes
-    * Métodos
-    * Extensibilidad
-    * Accesibilidad
+   * Clases
+   * Propiedades
+   * Constantes
+   * Métodos
+   * Extensibilidad
+   * Accesibilidad
     
 ## Loops y Widgets 
 
@@ -148,13 +139,12 @@
 
 ##  Asincronismo 
 
-  * Asincronismo
-    * Presentación de AJAX
-    * Timeout y eventos de cliente
-    * Comunicación cliente-servidor
-    * Procesamiento y devolución de datos
-    * Uso nativo de AJAX
-    * Uso de AJAX en WordPress
+   * Presentación de AJAX
+   * Timeout y eventos de cliente
+   * Comunicación cliente-servidor
+   * Procesamiento y devolución de datos
+   * Uso nativo de AJAX
+   * Uso de AJAX en WordPress
 
 ## Workshop :checkered_flag:
 
