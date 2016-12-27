@@ -57,7 +57,7 @@ function register_meta_box() {
 		$id,       // Atributo "id" impreso en el contenedor HTML. String.
 		$title,    // Título de meta box. String.
 		$callback, // Función que imprime nuestro HTML. String o función anónima.
-		$screen,   // Opcional. Vista o vistas donde va a aparecer la meta box. Nombres de post types u objeto WP_Screen.
+		$screen    // Opcional. Vista o vistas donde va a aparecer la meta box. Nombres de post types u objeto WP_Screen.
 	);
 }
 ```
@@ -73,7 +73,7 @@ function register_meta_box() {
 		'my-meta-box'
 		__( 'My meta box', 'my-plugin' ),
 		'my_metabox_callback',
-		'post', // También son válidos 'page', array( 'post', 'page' ) y current_screen().
+		'post'  // También son válidos 'page', array( 'post', 'page' ) y current_screen().
 	);
 }
 
@@ -163,7 +163,7 @@ function register_meta_box() {
 		'my-meta-box'
 		__( 'My meta box', 'my-plugin' ),
 		'my_metabox_callback',
-		'post', // También son válidos 'page', array( 'post', 'page' ) y current_screen().
+		'post' // También son válidos 'page', array( 'post', 'page' ) y current_screen().
 	);
 }
 
@@ -235,7 +235,7 @@ Para agregar un menú usamos la función `add_menu_page()`, y la asignamos como 
 
 ```php
 <?php
-add_action( 'admin_menu', 'portfolio_menu_page' );
+add_action( 'admin_menu', 'portfolio_add_menu_page' );
 
 function portfolio_add_menu_page() {
     add_menu_page(
@@ -262,7 +262,7 @@ El procedimiento es muy similar a agregar un menú, pero usando la función `add
 
 ```php
 <?php
-add_action( 'admin_menu', 'portfolio_menu_page', 999 );
+add_action( 'admin_menu', 'portfolio_add_menu_page', 999 );
 
 function portfolio_add_menu_page() {
     add_options_page(
@@ -287,7 +287,7 @@ En el caso de los post types, el nombre del slug es un poco más rebuscado que e
 
 ```php
 <?php
-add_action( 'admin_menu', 'portfolio_menu_page', 999 );
+add_action( 'admin_menu', 'portfolio_add_menu_page', 999 );
 
 function portfolio_add_menu_page() {
     add_submenu_page(
