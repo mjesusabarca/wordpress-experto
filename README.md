@@ -1,4 +1,4 @@
-# WordPress II
+# WordPress Experto
 
 ## Acerca del curso
 
