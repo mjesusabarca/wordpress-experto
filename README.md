@@ -21,7 +21,6 @@ Conviértete en un Desarrollador Avanzado en WordPress con nuestro curso de Nive
  * Martes y Jueves 
  * Sábados
 * Horarios disponibles:
- * Mañana: 10:30 - 13:00
  * Noche: 19:00 - 22:00
  * Turno sábados: 9:30 - 15:30
 
