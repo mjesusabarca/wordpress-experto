@@ -255,14 +255,14 @@ En el [curso de HTML y CSS de Codecademy](https://www.codecademy.com/learn/web) 
 
 ## Underscores
 
-Underscores (comúnmente llamado "\_S") es un starter theme creado y mantenido por Automattic para facilitar el desarrollo de nuevos themes. Está escrito siguiendo todos los estándares de código presentes en WordPress.org, e incluye los siguientes items, entre otras cosas:
+Underscores (comunmente llamado "\_s") es un starter theme creado y mantenido por Automattic para facilitar el desarrollo de nuevos themes. Está escrito siguiendo todos los estándares de código presentes en WordPress.org, e incluye los siguientes items, entre otras cosas:
 
 * CSS minimalista y estandarizado para los navegadores ms populares.
 * Templates básicos en HTML5, incluyendo uno para la página de error 404.
 * Funciones PHP básicas y fáciles de comprender.
 * Soporte para navegación multi-nivel.
 
-Para instalar Underscores, podemos generar un theme con un nombre propio desde http://underscores.me, o descargarlo desde ()[https://github.com/Automattic/\_s]. Si optamos por la segunda opción, también necesitamos reemplazar todas las apariciones de la cadena de texto "\_s" por una acorde al nombre de nuestro theme.
+Para instalar Underscores, podemos generar un theme con un nombre propio desde http://underscores.me, o descargarlo desde https://github.com/Automattic/_s. Si optamos por la segunda opción, también necesitamos reemplazar todas las apariciones de la cadena de texto "\_s" por una acorde al nombre de nuestro theme.
 
 Una vez que contamos con el archivo zip que contiene el theme, podemos subirlo a nuestra instalación de WordPress desde el panel de administración, clickeando el botón "Upload Theme" dentro de _Appearance > Themes > Add New_, o descomprimiendo el archivo y copiando la carpeta del theme a `wp-content/themes`.
 
