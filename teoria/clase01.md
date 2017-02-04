@@ -1,7 +1,5 @@
 # Clase 1
 
-[comment]: # Contenido completo
-
 ## Tecnologías
 
 ### PHP
