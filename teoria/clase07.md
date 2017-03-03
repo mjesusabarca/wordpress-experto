@@ -6,7 +6,7 @@
 
 ## Workshop
 
-Crear un plugin o theme propio, implementando los conocimientos adquiridos hasta la clase 7, y siguiendo los lineamientos de calidad de código detallados de el [Plugin Developer Handbook](https://developer.wordpress.org/plugins/). El objetivo final es subir el plugin o theme al directorio oficial de WordPress.
+Crear un plugin o theme propio, implementando los conocimientos adquiridos hasta la clase 7, y siguiendo los lineamientos de calidad de código detallados de el [Plugin Developer Handbook](https://developer.wordpress.org/plugins/).
 
 ## Internacionalización y Localización
 
